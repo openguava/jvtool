@@ -18,6 +18,11 @@ import io.github.openguava.jvtool.lang.util.CollectionUtils;
 import io.github.openguava.jvtool.lang.util.RegexUtils;
 import io.github.openguava.jvtool.lang.util.StringUtils;
 
+/**
+ * 认证逻辑实现
+ * @author openguava
+ *
+ */
 public abstract class SimpleAuthLogic implements AuthLogic {
 	
     /** 默认所有权限代码 */
@@ -70,24 +75,6 @@ public abstract class SimpleAuthLogic implements AuthLogic {
 	
 	public void setTokenSupplier(Supplier<AuthToken> tokenSupplier) {
 		this.tokenSupplier = tokenSupplier;
-	}
-	
-	@Override
-	public void login(AuthUser user) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void logout() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void logout(AuthToken token) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override

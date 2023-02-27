@@ -31,6 +31,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- validation-api -->
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- aspectj -->
 		<dependency>
 			<groupId>org.aspectj</groupId>

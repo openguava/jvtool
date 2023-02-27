@@ -13,7 +13,7 @@
 	<name>jvtool-lang</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<servlet-api.version>4.0.1</servlet-api.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
 		<!-- slf4j-api -->

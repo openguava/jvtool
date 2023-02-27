@@ -11,7 +11,7 @@ import io.github.openguava.jvtool.lang.auth.annotation.RequiresPermissions;
 import io.github.openguava.jvtool.lang.auth.annotation.RequiresRoles;
 
 /**
- * 用户认证工具类
+ * 认证工具类
  * @author openguava
  *
  */
@@ -44,78 +44,158 @@ public class AuthUtils {
 		return AuthUtils.authLogic;
 	}
 	
+	public static void setAuthLogic(AuthLogic authLogic) {
+		synchronized (AuthUtils.class) {
+			AuthUtils.authLogic = authLogic;
+		}
+	}
+	
 	protected AuthUtils() {
 		
 	}
 	
+	/**
+	 * 执行用户登录
+	 * @param user
+	 */
 	public static void login(AuthUser user) {
 		getAuthLogic().login(user);
 	}
 	
+	/**
+	 * 执行用户注销
+	 * @param token
+	 */
 	public static void logout(AuthToken token) {
 		getAuthLogic().logout(token);
 	}
 	
+	/**
+	 * 校验登录状态
+	 * 未登录引发LoginAuthException异常
+	 */
 	public static void checkLogin() {
 		getAuthLogic().checkLogin();
 	}
 	
+	/**
+	 * 判断是否登录
+	 * @return
+	 */
 	public static boolean isLogin() {
 		return getAuthLogic().isLogin();
 	}
 	
+	/**
+	 * 获取登录令牌
+	 * @return
+	 */
 	public static AuthToken getLoginToken() {
 		return getAuthLogic().getLoginToken();
 	}
 	
+	/**
+	 * 获取登录用户
+	 * @return
+	 */
 	public static AuthUser getLoginUser() {
 		return getAuthLogic().getLoginUser();
 	}
 	
+	/**
+	 * 是否拥有指定角色
+	 * @param role
+	 * @return
+	 */
 	public static boolean hasRole(String role) {
 		return getAuthLogic().hasRole(role);
 	}
 	
+	/**
+	 * 校验指定角色
+	 * @param role
+	 */
 	public static void checkRole(String role) {
 		getAuthLogic().checkRole(role);
 	}
 	
+	/**
+	 * 校验角色注解
+	 * @param requiresRoles
+	 */
 	public static void checkRole(RequiresRoles requiresRoles) {
 		getAuthLogic().checkRole(requiresRoles);
 	}
 	
+	/**
+	 * 校验角色集合(AND)
+	 * @param role
+	 */
 	public static void checkRoleAnd(String... role) {
 		getAuthLogic().checkRoleAnd(role);
 	}
 	
+	/**
+	 * 校验角色集合(OR)
+	 * @param role
+	 */
 	public static void checkRoleOr(String... role) {
 		getAuthLogic().checkRoleOr(role);
 	}
 	
+	/**
+	 * 是否拥有权限
+	 * @param permission
+	 * @return
+	 */
 	public static boolean hasPermission(String permission) {
 		return getAuthLogic().hasPermission(permission);
 	}
 	
+	/**
+	 * 校验权限
+	 * @param permission
+	 */
 	public static void checkPermission(String permission) {
 		getAuthLogic().checkPermission(permission);
 	}
 	
+	/**
+	 * 校验权限注解
+	 * @param requiresPermissions
+	 */
 	public static void checkPermission(RequiresPermissions requiresPermissions) {
 		getAuthLogic().checkPermission(requiresPermissions);
 	}
 	
+	/**
+	 * 校验权限集合(AND)
+	 * @param permissions
+	 */
 	public static void checkPermissionAnd(String... permissions) {
 		getAuthLogic().checkPermissionAnd(permissions);
 	}
 	
+	/**
+	 * 校验权限集合(OR)
+	 * @param permissions
+	 */
 	public static void checkPermissionOr(String... permissions) {
 		getAuthLogic().checkPermissionOr(permissions);
 	}
 	
+	/**
+	 * 校验匿名注解
+	 * @param requiresAnonymous
+	 */
 	public static void checkAnonymous(RequiresAnonymous requiresAnonymous) {
 		getAuthLogic().checkAnonymous(requiresAnonymous);
 	}
 	
+	/**
+	 * 校验API
+	 * @param requiresApi
+	 */
 	public static void checkApi(RequiresApi requiresApi) {
 		getAuthLogic().checkApi(requiresApi);
 	}
