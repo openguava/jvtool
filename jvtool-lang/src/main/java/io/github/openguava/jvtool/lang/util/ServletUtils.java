@@ -433,6 +433,16 @@ public class ServletUtils {
 	 * 获取请求参数
 	 * @param request
 	 * @param name 参数名称
+	 * @return
+	 */
+	public static String getRequestParameter(HttpServletRequest request, String name) {
+		return getRequestParameter(request, name, CharsetConstants.UTF_8);
+	}
+	
+	/**
+	 * 获取请求参数
+	 * @param request
+	 * @param name 参数名称
 	 * @param charset 字符集
 	 * @return
 	 */
@@ -461,29 +471,76 @@ public class ServletUtils {
 	/**
 	 * 获取请求整型参数
 	 * @param request
-	 * @param name
+	 * @param name 参数名
 	 * @return
 	 */
 	public static Integer getRequestParameterInteger(HttpServletRequest request, String name) {
+		return getRequestParameterInteger(request, name, null);
+	}
+	
+	/**
+	 * 获取请求整型参数
+	 * @param request
+	 * @param name 参数名
+	 * @param defValue 默认值
+	 * @return
+	 */
+	public static Integer getRequestParameterInteger(HttpServletRequest request, String name, Integer defValue) {
 		String parameter = getRequestParameter(request, name, null);
 		if(NumberUtils.isInteger(parameter)) {
 			return NumberUtils.parseInt(parameter);
 		}
-		return null;
+		return defValue;
 	}
 	
 	/**
 	 * 获取请求长整型参数
 	 * @param request
-	 * @param name
+	 * @param name 参数名
 	 * @return
 	 */
 	public static Long getRequestParameterLong(HttpServletRequest request, String name) {
+		return getRequestParameterLong(request, name, null);
+	}
+	
+	/**
+	 * 获取请求长整型参数
+	 * @param request
+	 * @param name 参数名
+	 * @param defValue 默认值
+	 * @return
+	 */
+	public static Long getRequestParameterLong(HttpServletRequest request, String name, Long defValue) {
 		String parameter = getRequestParameter(request, name, null);
 		if(NumberUtils.isLong(parameter)) {
 			return NumberUtils.parseLong(parameter);
 		}
-		return null;
+		return defValue;
+	}
+	
+	/**
+	 * 获取请求布尔值参数
+	 * @param request
+	 * @param name 参数名
+	 * @return
+	 */
+	public static Boolean getRequestParameterBoolean(HttpServletRequest request, String name) {
+		return getRequestParameterBoolean(request, name, null);
+	}
+	
+	/**
+	 * 获取请求布尔值参数
+	 * @param request
+	 * @param name 参数名
+	 * @param defValue 默认值
+	 * @return
+	 */
+	public static Boolean getRequestParameterBoolean(HttpServletRequest request, String name, Boolean defValue) {
+		String parameter = getRequestParameter(request, name, null);
+		if(StringUtils.isNotEmpty(parameter)) {
+			return BooleanUtils.toBoolean(parameter);
+		}
+		return defValue;
 	}
 	
 	/**

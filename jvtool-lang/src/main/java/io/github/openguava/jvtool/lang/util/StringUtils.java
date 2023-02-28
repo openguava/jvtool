@@ -2744,6 +2744,64 @@ public class StringUtils {
     public static String toStringOrEmpty(final Object obj) {
         return Objects.toString(obj, STRING_EMPTY);
     }
+	
+	/**
+     * 驼峰命名转下划线命名
+     * @param str
+     * @return
+     */
+	public static String camelToUnderlineCase(String str) {
+		if(isEmpty(str)) {
+			return str;
+		}
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < str.length(); i++) {
+			// 当前字符
+			char curreChar = str.charAt(i);
+			// 当前为大写字母
+			if(Character.isUpperCase(curreChar)) {
+				// 非首字母大写增加下划线前缀
+				if(i > 0 && str.charAt(i - 1) != CharConstants.CHAR_UNDERLINE) {
+					sb.append(CharConstants.CHAR_UNDERLINE);
+				}
+				// 大写字母转小写
+				curreChar = Character.toLowerCase(curreChar);
+			}
+			// 增加当前字符
+			sb.append(curreChar);
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * 下划线命名转驼峰命名
+	 * @param str
+	 * @return
+	 */
+	public static String underlineToCamelCase(String str) {
+		if(isEmpty(str)) {
+			return str;
+		}
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < str.length(); i++) {
+			// 当前字符
+			char curreChar = str.charAt(i);
+			// 忽略下划线
+			if(curreChar == CharConstants.CHAR_UNDERLINE) {
+				continue;
+			}
+			// 如果存在上一字符且为下划线,则当前字符转大写
+			if(i > 0 && str.charAt(i - 1) == CharConstants.CHAR_UNDERLINE) {
+				curreChar = Character.toUpperCase(curreChar);
+			}
+			// 首字母驼峰命名转小写
+			if(sb.length() == 0) {
+				curreChar = Character.toLowerCase(curreChar);
+			}
+			sb.append(curreChar);
+		}
+		return sb.toString();
+	}
     
 	/**
 	 * 编码字符串<br>

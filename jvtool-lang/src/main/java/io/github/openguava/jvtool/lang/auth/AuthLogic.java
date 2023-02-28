@@ -46,13 +46,13 @@ public interface AuthLogic {
 	 * 获取登录令牌
 	 * @return
 	 */
-	AuthToken getLoginToken();
+	AuthToken getLoginToken(boolean check);
 	
 	/**
 	 * 获取登录用户
 	 * @return
 	 */
-	AuthUser getLoginUser();
+	AuthUser getLoginUser(boolean check);
 
 	/**
 	 * 是否拥有指定角色

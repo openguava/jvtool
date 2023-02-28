@@ -40,6 +40,9 @@ public class CharConstants {
 	/** 字符串: . */
 	public static final char CHAR_DOT = '.';
 	
+	/** 字符常量：下划线 */
+	public static final char CHAR_UNDERLINE = '_';
+	
 	/** \r\n 字符集合 */
 	public static final char[] CHARS_CRLF =  { CHAR_CR, CHAR_LF };
 	

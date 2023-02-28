@@ -12,10 +12,12 @@ import java.util.concurrent.ConcurrentMap;
  * @author openguava
  *
  */
-public class AbstractCacheManager<K, V> implements CacheManager<K, V> {
+public class AbstractCacheManager implements CacheManager {
 
-	private final ConcurrentMap<String, Cache<K, V>> cacheMap = new ConcurrentHashMap<>(16);
+	/** 缓存Map集合 */
+	private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<>(16);
 	
+	/** 缓存名集合 */
 	private volatile Set<String> cacheNames = Collections.emptySet();
 	
 	@Override
@@ -24,14 +26,14 @@ public class AbstractCacheManager<K, V> implements CacheManager<K, V> {
 	}
 	
 	@Override
-	public Cache<K, V> getCache(String name) {
+	public Cache getCache(String name) {
 		// Quick check for existing cache...
-		Cache<K, V> cache = this.cacheMap.get(name);
+		Cache cache = this.cacheMap.get(name);
 		if (cache != null) {
 			return cache;
 		}
 		// The provider may support on-demand cache creation...
-		Cache<K, V> missingCache = this.getMissingCache(name);
+		Cache missingCache = this.getMissingCache(name);
 		if(missingCache == null) {
 			return cache;
 		}
@@ -52,7 +54,7 @@ public class AbstractCacheManager<K, V> implements CacheManager<K, V> {
 	 * @param name
 	 * @return
 	 */
-	protected final Cache<K, V> lookupCache(String name) {
+	protected final Cache lookupCache(String name) {
 		return this.cacheMap.get(name);
 	}
 
@@ -60,7 +62,7 @@ public class AbstractCacheManager<K, V> implements CacheManager<K, V> {
 	 * 添加缓存对象
 	 * @param cache
 	 */
-	protected final void addCache(Cache<K, V> cache) {
+	protected final void addCache(Cache cache) {
 		String name = cache.getName();
 		synchronized (this.cacheMap) {
 			if (this.cacheMap.put(name, decorateCache(cache)) == null) {
@@ -85,7 +87,7 @@ public class AbstractCacheManager<K, V> implements CacheManager<K, V> {
 	 * @param cache
 	 * @return
 	 */
-	protected Cache<K, V> decorateCache(Cache<K, V> cache) {
+	protected Cache decorateCache(Cache cache) {
 		return cache;
 	}
 	
@@ -94,7 +96,7 @@ public class AbstractCacheManager<K, V> implements CacheManager<K, V> {
 	 * @param name
 	 * @return
 	 */
-	protected Cache<K, V> getMissingCache(String name) {
+	protected Cache getMissingCache(String name) {
 		return null;
 	}
 }

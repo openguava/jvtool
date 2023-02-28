@@ -88,18 +88,20 @@ public class AuthUtils {
 	
 	/**
 	 * 获取登录令牌
+	 * @param check 是否校验(校验失败则引发异常)
 	 * @return
 	 */
-	public static AuthToken getLoginToken() {
-		return getAuthLogic().getLoginToken();
+	public static AuthToken getLoginToken(boolean check) {
+		return getAuthLogic().getLoginToken(check);
 	}
 	
 	/**
 	 * 获取登录用户
+	 * @param check 是否校验(校验失败则引发异常)
 	 * @return
 	 */
-	public static AuthUser getLoginUser() {
-		return getAuthLogic().getLoginUser();
+	public static AuthUser getLoginUser(boolean check) {
+		return getAuthLogic().getLoginUser(check);
 	}
 	
 	/**

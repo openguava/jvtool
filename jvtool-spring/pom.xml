@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>io.github.openguava</groupId>
 		<artifactId>jvtool</artifactId>
-		<version>0.0.1</version>
+		<version>0.0.2</version>
 	</parent>
 	<artifactId>jvtool-spring</artifactId>
 	<name>jvtool-spring</name>
@@ -17,11 +17,10 @@
 	</properties>
 	<dependencies>
 
-		<!-- jvtool-lang -->
+		<!-- jackson -->
 		<dependency>
-			<groupId>io.github.openguava</groupId>
-			<artifactId>jvtool-lang</artifactId>
-			<version>${project.parent.version}</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
 		</dependency>
 
 		<!-- servlet-api -->
@@ -64,6 +63,19 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<scope>provided</scope>
+		</dependency>
+
+		<!-- mybatis-plus -->
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- jvtool-lang -->
+		<dependency>
+			<groupId>io.github.openguava</groupId>
+			<artifactId>jvtool-lang</artifactId>
 		</dependency>
 
 		<!-- junit -->

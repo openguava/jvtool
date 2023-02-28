@@ -9,7 +9,7 @@ import io.github.openguava.jvtool.lang.constant.StringConstants;
  * @param <K>
  * @param <V>
  */
-public abstract class AbstractCache<K, V> implements Cache<K, V> {
+public abstract class AbstractCache implements Cache {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -38,7 +38,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 	 * 初始化
 	 */
 	public AbstractCache() {
-		this.name = StringConstants.STRING_EMPTY;
+		this(StringConstants.STRING_EMPTY);
 	}
 	
 	/**
@@ -47,10 +47,5 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 	 */
 	public AbstractCache(String name) {
 		this.name = name;
-	}
-
-	@Override
-	public Object getNativeCache() {
-		return this;
 	}
 }

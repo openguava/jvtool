@@ -3,26 +3,21 @@ package io.github.openguava.jvtool.lang.cache.timed;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import io.github.openguava.jvtool.lang.cache.AbstractCache;
-import io.github.openguava.jvtool.lang.cache.MapCache;
+import io.github.openguava.jvtool.lang.map.SafeConcurrentHashMap;
 
-public class TimedCache<K, V> extends AbstractCache<K, V> implements Closeable {
+public class TimedCache extends AbstractCache implements Closeable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private MapCache<K, TimedValueWrapper<K, V>> nativeCache;
-	
-	@Override
-	public Object getNativeCache() {
-		return this.nativeCache;
-	}
+	private final ConcurrentMap<Object, TimedValueWrapper<Object, Object>> map = new SafeConcurrentHashMap<>();
 	
 	/**
 	 * 定时服务
@@ -36,7 +31,7 @@ public class TimedCache<K, V> extends AbstractCache<K, V> implements Closeable {
 	 * 初始化
 	 */
 	public TimedCache() {
-		this.nativeCache = new MapCache<>(new ConcurrentHashMap<>());
+		super();
 	}
 	
 	/**
@@ -44,18 +39,18 @@ public class TimedCache<K, V> extends AbstractCache<K, V> implements Closeable {
 	 * @param name
 	 */
 	public TimedCache(String name) {
-		this.nativeCache = new MapCache<>(name, new ConcurrentHashMap<>());
+		super(name);
 	}
 
 	@Override
-	public V get(K key) {
-		synchronized (this.nativeCache) {
-			TimedValueWrapper<K, V> wrapper = this.nativeCache.get(key);
+	public Object get(Object key) {
+		synchronized (this.map) {
+			TimedValueWrapper<Object, Object> wrapper = this.map.get(key);
 			if(wrapper == null) {
 				return null;
 			}
 			if(wrapper.isExpired()) {
-				this.nativeCache.remove(key);
+				this.map.remove(key);
 				return null;
 			}
 			return wrapper.get();
@@ -63,42 +58,40 @@ public class TimedCache<K, V> extends AbstractCache<K, V> implements Closeable {
 	}
 
 	@Override
-	public V get(K key, Callable<V> valueLoader) {
-		TimedValueWrapper<K, V> wrapper = this.nativeCache.get(key, () -> new TimedValueWrapper<>(key, valueLoader.call()));
+	public Object get(Object key, Supplier<Object> valueLoader) {
+		TimedValueWrapper<Object, Object> wrapper = this.map.computeIfAbsent(key, x -> new TimedValueWrapper<>(key, valueLoader.get()));
 		return wrapper != null ? wrapper.get() : null;
 	}
 
 	@Override
-	public V put(K key, V value) {
-		TimedValueWrapper<K, V> wrapper = this.nativeCache.put(key, new TimedValueWrapper<>(key, value));
-		return wrapper != null ? wrapper.get() : value;
+	public void put(Object key, Object value) {
+		this.map.put(key, new TimedValueWrapper<>(key, value));
 	}
 
 	@Override
-	public V put(K key, V value, long ttl) {
-		TimedValueWrapper<K, V> wrapper = this.nativeCache.put(key, new TimedValueWrapper<>(key, value, ttl));
-		return wrapper != null ? wrapper.get() : value;
+	public void put(Object key, Object value, long ttl) {
+		this.map.put(key, new TimedValueWrapper<>(key, value, ttl));
 	}
 
 	@Override
-	public V remove(K key) {
-		TimedValueWrapper<K, V> wrapper = this.nativeCache.remove(key);
-		return wrapper != null ? wrapper.get() : null;
+	public boolean remove(Object key) {
+		TimedValueWrapper<Object, Object> wrapper = this.map.remove(key);
+		return wrapper != null;
 	}
 
 	@Override
-	public Set<K> keys(K pattern) {
-		return this.nativeCache.keys(pattern);
+	public Set<Object> keys(Object pattern) {
+		return this.map.keySet();
 	}
 
 	@Override
-	public long size(K pattern) {
-		return this.nativeCache.size(pattern);
+	public long size(Object pattern) {
+		return this.map.size();
 	}
 
 	@Override
 	public void clear() {
-		this.nativeCache.clear();
+		this.map.clear();
 	}
 	
 	/**

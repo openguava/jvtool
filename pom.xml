@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.openguava</groupId>
 	<artifactId>jvtool</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<packaging>pom</packaging>
 	<name>jvtool</name>
 	<description>java language tool</description>
@@ -43,6 +43,14 @@
 		<validation-api.version>2.0.1.Final</validation-api.version>
 		<aspectj.version>1.9.19</aspectj.version>
 		<spring.version>5.2.22.RELEASE</spring.version>
+		<spring-boot.version>2.7.7</spring-boot.version>
+		<spring-cloud.version>2021.0.5</spring-cloud.version>
+		<spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
+		<alibaba.nacos.version>1.4.2</alibaba.nacos.version>
+		<alibaba.seata.version>1.5.1.1</alibaba.seata.version>
+		<druid.version>1.2.15</druid.version>
+		<mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+		<pagehelper.boot.version>1.4.6</pagehelper.boot.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -147,6 +155,71 @@
 				<version>${spring.version}</version>
 			</dependency>
 
+			<!-- SpringBoot -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- SpringCloud -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- SpringCloud Alibaba -->
+			<dependency>
+				<groupId>com.alibaba.cloud</groupId>
+				<artifactId>spring-cloud-alibaba-dependencies</artifactId>
+				<version>${spring-cloud-alibaba.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			
+			<!-- druid -->
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>druid-spring-boot-starter</artifactId>
+				<version>${druid.version}</version>
+			</dependency>
+			
+			<!-- mybatis-plus -->
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus</artifactId>
+				<version>${mybatis-plus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-boot-starter</artifactId>
+				<version>${mybatis-plus.version}</version>
+			</dependency>
+			
+			<!-- pagehelper 分页插件 -->
+			<dependency>
+				<groupId>com.github.pagehelper</groupId>
+				<artifactId>pagehelper-spring-boot-starter</artifactId>
+				<version>${pagehelper.boot.version}</version>
+			</dependency>
+
+			<!-- jvtool -->
+			<dependency>
+				<groupId>io.github.openguava</groupId>
+				<artifactId>jvtool-lang</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openguava</groupId>
+				<artifactId>jvtool-spring</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
 			<!-- junit -->
 			<dependency>
 				<groupId>junit</groupId>
@@ -169,6 +242,9 @@
 
 	<modules>
 		<module>jvtool-lang</module>
+		<module>jvtool-spring</module>
+		<module>jvtool-boot</module>
+		<module>jvtool-cloud</module>
 	</modules>
 
 	<build>

@@ -78,37 +78,38 @@ public abstract class SimpleAuthLogic implements AuthLogic {
 	}
 	
 	@Override
-	public AuthToken getLoginToken() {
+	public AuthToken getLoginToken(boolean check) {
 		Supplier<AuthToken> supplier = this.getTokenSupplier();
-		return supplier == null ? null : supplier.get();
+		AuthToken loginToken = supplier == null ? null : supplier.get();
+		if(loginToken == null && check) {
+			throw new LoginAuthException("未提供token");
+		}
+		return loginToken;
 	}
 
 	@Override
-	public AuthUser getLoginUser() {
+	public AuthUser getLoginUser(boolean check) {
 		Supplier<AuthUser> supplier = this.getUserSupplier();
-		return supplier == null ? null : supplier.get();
+		AuthUser loginUser = supplier == null ? null : supplier.get();
+		if(loginUser == null && check) {
+			throw new LoginAuthException("无效的token"); 
+		}
+		return loginUser;
 	}
 
 	@Override
 	public AuthUser checkLogin() {
-		AuthToken token = this.getLoginToken();
-		if(token == null) {
-			throw new LoginAuthException("未提供token");
-		}
-		AuthUser user = this.getLoginUser();
-		if(user == null) {
-			throw new LoginAuthException("无效的token");
-		}
-		return user;
+		this.getLoginToken(true);
+		return this.getLoginUser(true);
 	}
 
 	@Override
 	public boolean isLogin() {
-		AuthToken token = this.getLoginToken();
+		AuthToken token = this.getLoginToken(false);
 		if(token == null) {
 			return false;
 		}
-		AuthUser user = this.getLoginUser();
+		AuthUser user = this.getLoginUser(false);
 		if(user == null) {
 			return false;
 		}
@@ -214,7 +215,7 @@ public abstract class SimpleAuthLogic implements AuthLogic {
 	 */
 	protected Set<String> getRoles() {
 		try {
-			AuthUser user = this.getLoginUser();
+			AuthUser user = this.getLoginUser(false);
 			return user != null ? user.getRoles() : new HashSet<>();
 		} catch (Exception e) {
 			return new HashSet<>();
@@ -227,7 +228,7 @@ public abstract class SimpleAuthLogic implements AuthLogic {
 	 */
 	protected Set<String> getPermission() {
 		try {
-			AuthUser user = this.getLoginUser();
+			AuthUser user = this.getLoginUser(false);
 			return user != null ? user.getPermissions() : new HashSet<>();
 		} catch (Exception e) {
 			return new HashSet<>();
