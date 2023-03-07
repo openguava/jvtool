@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import io.github.openguava.jvtool.lang.SFunction;
 
 /**
  * 集合工具类
@@ -301,6 +304,27 @@ public class CollectionUtils {
 	}
 	
 	/**
+	 * 判断给定的set列表中是否包含数组array 判断给定的数组array中是否包含给定的元素value
+	 *
+	 * @param set   给定的集合
+	 * @param array 给定的数组
+	 * @return boolean 结果
+	 */
+	@SafeVarargs
+	public static <T> boolean containsAny(Collection<T> collection, T... array) {
+		if (isEmpty(collection) || isEmpty(array)) {
+			return false;
+		} else {
+			for (T item : array) {
+				if (collection.contains(item)) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+	
+	/**
 	 * 获取集合首个元素
 	 * @param <T>
 	 * @param items
@@ -407,6 +431,63 @@ public class CollectionUtils {
 			}
 		}
 		return result;
+	}
+	
+	@SafeVarargs
+	public static <T> long count(Iterable<T> items, Predicate<T>... predicates) {
+		if(isEmpty(items)) {
+			return 0L;
+		}
+		long c = 0L;
+		for(T item : items) {
+			boolean match = true;
+			for(Predicate<T> predicate : predicates) {
+				if(!predicate.test(item)) {
+					match = false;
+					break;
+				}
+			}
+			if(match) {
+				c++;
+			}
+		}
+		return c;
+	}
+	
+	/**
+	 * 集合分组
+	 * @param <T>
+	 * @param <R>
+	 * @param items
+	 * @param func
+	 * @return
+	 */
+	public static <T, R> Set<R> groupBy(Iterable<T> items, SFunction<T, R> func) {
+		return groupBy(items, func, false);
+	}
+	
+	/**
+	 * 集合分组
+	 * @param <T>
+	 * @param <R>
+	 * @param items
+	 * @param func
+	 * @param allowNull
+	 * @return
+	 */
+	public static <T, R> Set<R> groupBy(Iterable<T> items, SFunction<T, R> func, boolean allowNull) {
+		Set<R> set = new LinkedHashSet<>();
+		if(isEmpty(items)) {
+			return set;
+		}
+		for(T item : items) {
+			R r = func.apply(item);
+			if(r == null && !allowNull) {
+				continue;
+			}
+			set.add(r);
+		}
+		return set;
 	}
 	
 	/**

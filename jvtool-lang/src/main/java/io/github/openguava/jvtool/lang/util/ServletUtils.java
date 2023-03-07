@@ -94,6 +94,15 @@ public class ServletUtils {
 	}
 	
 	/**
+	 * 获取当前 servlet 请求
+	 * @param request
+	 * @return
+	 */
+	public static HttpServletRequest getRequest(HttpServletRequest request) {
+		return request != null ? request : getRequest();
+	}
+	
+	/**
 	 * 获取当前 servlet 响应
 	 * @return
 	 */
@@ -113,6 +122,15 @@ public class ServletUtils {
 			return getJettyResponse(jettyHttpChannel);
 		}
 		return null;
+	}
+	
+	/**
+	 * 获取当前 servlet 响应
+	 * @param response
+	 * @return
+	 */
+	public static HttpServletResponse getResponse(HttpServletResponse response) {
+		return response != null ? response : getResponse();
 	}
 	
 	/**
@@ -881,42 +899,21 @@ public class ServletUtils {
 		String ip;
 		for (String header : headers) {
 			ip = request.getHeader(header);
-			if (!isUnknow(ip)) {
-				return getMultistageReverseProxyIp(ip);
+			if (!IpUtils.isUnknown(ip)) {
+				return IpUtils.getMultistageReverseProxyIp(ip);
 			}
 		}
 		ip = request.getRemoteAddr();
-		return getMultistageReverseProxyIp(ip);
+		return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : IpUtils.getMultistageReverseProxyIp(ip);
 	}
 	
 	/**
-	 * 从多级反向代理中获得第一个非unknown IP地址
-	 * 
-	 * @param ip 获得的IP地址
-	 * @return 第一个非unknown IP地址
+	 * 获取请求客户端支持的语言
+	 * @param request
+	 * @return
 	 */
-	private static String getMultistageReverseProxyIp(String ip) {
-		// 多级反向代理检测
-		if (ip != null && ip.indexOf(",") > 0) {
-			final String[] ips = ip.trim().split(",");
-			for (String subIp : ips) {
-				if (!isUnknow(subIp)) {
-					ip = subIp;
-					break;
-				}
-			}
-		}
-		return ip;
-	}
-	
-	/**
-	 * 检测给定字符串是否为未知，多用于检测HTTP请求相关<br>
-	 * 
-	 * @param checkString 被检测的字符串
-	 * @return 是否未知
-	 */
-	public static boolean isUnknow(String checkString) {
-		return StringUtils.isBlank(checkString) || "unknown".equalsIgnoreCase(checkString);
+	public static String getRequestAcceptLanguage(HttpServletRequest request) {
+		return getRequestHeader(request, HttpConstants.HTTP_HEADER_ACCEPT_LANGUAGE, true);
 	}
 	
 	/**

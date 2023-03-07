@@ -1,6 +1,7 @@
 package io.github.openguava.jvtool.boot.redis.config;
 
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -22,8 +23,9 @@ public class RedisConfig extends CachingConfigurerSupport {
 	 * @return
 	 */
 	@Bean
-	public RedisTemplate<Object, Object> createRedisTemplate(RedisConnectionFactory connectionFactory) {
-		RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
+	@ConditionalOnMissingBean
+	public RedisTemplate<String, Object> createRedisTemplate(RedisConnectionFactory connectionFactory) {
+		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(connectionFactory);
 		
 		// serializer

@@ -143,4 +143,27 @@ public class ImageUtils {
 			return null;
 		}
 	}
+	
+	/**
+	 * 获取图片文件扩展名
+	 * @param imageBytes 图片数据
+	 * @return
+	 */
+	public static String getImageFileExtendName(byte[] imageBytes) {
+		if(ArrayUtils.isEmpty(imageBytes)) {
+			return null;
+		}
+		String strFileExtendName = "JPG";
+		if ((imageBytes[0] == 71) && (imageBytes[1] == 73) && (imageBytes[2] == 70) && (imageBytes[3] == 56)
+				&& ((imageBytes[4] == 55) || (imageBytes[4] == 57)) && (imageBytes[5] == 97)) {
+			strFileExtendName = "GIF";
+		} else if ((imageBytes[6] == 74) && (imageBytes[7] == 70) && (imageBytes[8] == 73) && (imageBytes[9] == 70)) {
+			strFileExtendName = "JPG";
+		} else if ((imageBytes[0] == 66) && (imageBytes[1] == 77)) {
+			strFileExtendName = "BMP";
+		} else if ((imageBytes[1] == 80) && (imageBytes[2] == 78) && (imageBytes[3] == 71)) {
+			strFileExtendName = "PNG";
+		}
+		return strFileExtendName;
+	}
 }

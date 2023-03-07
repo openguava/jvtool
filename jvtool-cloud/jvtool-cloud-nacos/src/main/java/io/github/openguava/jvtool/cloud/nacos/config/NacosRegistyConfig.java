@@ -34,6 +34,7 @@ public class NacosRegistyConfig implements ApplicationRunner {
             Integer tomcatPort = this.getWebPort();
             if(tomcatPort == null) {
             	tomcatPort = port;
+            	LogUtils.info(NacosRegistyConfig.class, "Nacos Registy 使用内置容器端口: {}", tomcatPort);
             } else {
             	LogUtils.info(NacosRegistyConfig.class, "Nacos Registy 检测到外部容器端口: {}", tomcatPort);
             }

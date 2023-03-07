@@ -8,6 +8,7 @@ import io.github.openguava.jvtool.lang.auth.AuthLogic;
 import io.github.openguava.jvtool.lang.auth.AuthToken;
 import io.github.openguava.jvtool.lang.auth.AuthUser;
 import io.github.openguava.jvtool.lang.auth.annotation.Logical;
+import io.github.openguava.jvtool.lang.auth.annotation.RequiresAnonymous;
 import io.github.openguava.jvtool.lang.auth.annotation.RequiresApi;
 import io.github.openguava.jvtool.lang.auth.annotation.RequiresPermissions;
 import io.github.openguava.jvtool.lang.auth.annotation.RequiresRoles;
@@ -15,6 +16,7 @@ import io.github.openguava.jvtool.lang.auth.exception.LoginAuthException;
 import io.github.openguava.jvtool.lang.auth.exception.PermissionAuthException;
 import io.github.openguava.jvtool.lang.auth.exception.RoleAuthException;
 import io.github.openguava.jvtool.lang.util.CollectionUtils;
+import io.github.openguava.jvtool.lang.util.CryptoUtils;
 import io.github.openguava.jvtool.lang.util.RegexUtils;
 import io.github.openguava.jvtool.lang.util.StringUtils;
 
@@ -208,6 +210,11 @@ public abstract class SimpleAuthLogic implements AuthLogic {
 	public void checkApi(RequiresApi requiresApi) {
 		
 	}
+	
+	@Override
+	public void checkAnonymous(RequiresAnonymous requiresAnonymous) {
+		
+	}
 
 	/**
 	 * 获取角色列表
@@ -253,5 +260,15 @@ public abstract class SimpleAuthLogic implements AuthLogic {
 	 */
 	protected boolean hasPermission(Set<String> permissions, String permission) {
 		return CollectionUtils.anyMatch(permissions, x -> StringUtils.isNotBlank(x) && (this.getAllPermissionCode().equalsIgnoreCase(x) || RegexUtils.simpleMatch(x, permission)));
+	}
+	
+	@Override
+	public String encryptPassword(String password) {
+		return CryptoUtils.encodeBCrypt(password);
+	}
+	
+	@Override
+	public boolean matchesPassword(String rawPassword, String encryptedPassword) {
+		return CryptoUtils.matchesBCrypt(rawPassword, encryptedPassword);
 	}
 }

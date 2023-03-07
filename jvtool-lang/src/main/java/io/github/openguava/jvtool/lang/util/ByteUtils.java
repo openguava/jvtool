@@ -42,6 +42,48 @@ public class ByteUtils {
 		
 	}
 	
+    /**
+     * 转换为byte<br>
+     * 如果给定的值为<code>null</code>，或者转换失败，返回默认值<code>null</code><br>
+     * 转换失败不会报错
+     *
+     * @param value 被转换的值
+     * @return 结果
+     */
+    public static Byte toByte(Object value) {
+        return toByte(value, null);
+    }
+	
+	/**
+	 * 转换为byte<br>
+	 * 如果给定的值为<code>null</code>，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 * 
+	 * @param value        被转换的值
+	 * @param defaultValue 转换错误时的默认值
+	 * @return 结果
+	 */
+	public static Byte toByte(Object value, Byte defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+		if (value instanceof Byte) {
+			return (Byte) value;
+		}
+		if (value instanceof Number) {
+			return ((Number) value).byteValue();
+		}
+		final String valueStr = StringUtils.toStringOrNull(value);
+		if (StringUtils.isEmpty(valueStr)) {
+			return defaultValue;
+		}
+		try {
+			return Byte.parseByte(valueStr);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
 	/**
 	 * int转byte
 	 *
@@ -482,7 +524,7 @@ public class ByteUtils {
 			doubleAdder.add(bytesToDouble(bytes, byteOrder));
 			number = doubleAdder;
 		} else if (BigDecimal.class == targetClass) {
-			number = NumberUtils.toBigDecimal(bytesToDouble(bytes, byteOrder));
+			number = NumberUtils.numberToBigDecimal(bytesToDouble(bytes, byteOrder));
 		} else if (BigInteger.class == targetClass) {
 			number = BigInteger.valueOf(bytesToLong(bytes, byteOrder));
 		} else if (Number.class == targetClass) {

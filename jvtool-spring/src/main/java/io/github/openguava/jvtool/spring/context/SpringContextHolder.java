@@ -159,7 +159,7 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
 	 */
 	public static ServletRequestAttributes getServletRequestAttributes() {
 		try {
-			return (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+			return (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		} catch (Exception e) {
 			LogUtils.error(SpringContextHolder.class, e.getMessage(), e);
 			return null;

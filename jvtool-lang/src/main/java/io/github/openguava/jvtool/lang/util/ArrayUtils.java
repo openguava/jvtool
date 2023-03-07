@@ -2634,6 +2634,34 @@ public class ArrayUtils {
 	}
 	
 	/**
+	 * 数组过滤计数
+	 * @param <T>
+	 * @param array
+	 * @param predicates
+	 * @return
+	 */
+	@SafeVarargs
+	public static <T> long count(T[] array, Predicate<T>... predicates) {
+		if(isEmpty(array)) {
+			return 0L;
+		}
+		long c = 0L;
+		for(T item : array) {
+			boolean match = true;
+			for(Predicate<T> predicate : predicates) {
+				if(!predicate.test(item)) {
+					match = false;
+					break;
+				}
+			}
+			if(match) {
+				c++;
+			}
+		}
+		return c;
+	}
+	
+	/**
 	 * 数组任意匹配
 	 * @param <T>
 	 * @param array

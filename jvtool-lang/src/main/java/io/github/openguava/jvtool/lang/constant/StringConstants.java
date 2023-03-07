@@ -28,6 +28,9 @@ public class StringConstants {
 	/** \r\n 换行字符串  */
 	public static final String STRING_CRLF = new String(CharConstants.CHARS_CRLF);
 	
+	/** 当前系统换行字符 */
+	public static final String STRING_LINE_SEPARATOR = System.lineSeparator();
+	
 	/** 10个数字字符串 */
 	public static final String STRING_NUMBERS = new String(CharConstants.CHARS_NUMBERS);
 	

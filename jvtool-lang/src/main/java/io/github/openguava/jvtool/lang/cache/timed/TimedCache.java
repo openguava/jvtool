@@ -2,6 +2,8 @@ package io.github.openguava.jvtool.lang.cache.timed;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
@@ -11,13 +13,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import io.github.openguava.jvtool.lang.cache.AbstractCache;
+import io.github.openguava.jvtool.lang.constant.CharsetConstants;
 import io.github.openguava.jvtool.lang.map.SafeConcurrentHashMap;
+import io.github.openguava.jvtool.lang.util.ByteUtils;
+import io.github.openguava.jvtool.lang.util.CollectionUtils;
+import io.github.openguava.jvtool.lang.util.JsonUtils;
+import io.github.openguava.jvtool.lang.util.ObjectUtils;
+import io.github.openguava.jvtool.lang.util.RegexUtils;
+import io.github.openguava.jvtool.lang.util.StringUtils;
 
 public class TimedCache extends AbstractCache implements Closeable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final ConcurrentMap<Object, TimedValueWrapper<Object, Object>> map = new SafeConcurrentHashMap<>();
+	private final ConcurrentMap<String, TimedValueWrapper<String, Object>> map = new SafeConcurrentHashMap<>();
 	
 	/**
 	 * 定时服务
@@ -43,9 +52,9 @@ public class TimedCache extends AbstractCache implements Closeable {
 	}
 
 	@Override
-	public Object get(Object key) {
+	public Object get(String key) {
 		synchronized (this.map) {
-			TimedValueWrapper<Object, Object> wrapper = this.map.get(key);
+			TimedValueWrapper<String, Object> wrapper = this.map.get(key);
 			if(wrapper == null) {
 				return null;
 			}
@@ -58,35 +67,92 @@ public class TimedCache extends AbstractCache implements Closeable {
 	}
 
 	@Override
-	public Object get(Object key, Supplier<Object> valueLoader) {
-		TimedValueWrapper<Object, Object> wrapper = this.map.computeIfAbsent(key, x -> new TimedValueWrapper<>(key, valueLoader.get()));
+	public Object get(String key, Supplier<Object> valueLoader) {
+		TimedValueWrapper<String, Object> wrapper = this.map.computeIfAbsent(key, x -> new TimedValueWrapper<>(key, valueLoader.get()));
 		return wrapper != null ? wrapper.get() : null;
+	}
+	
+	@Override
+	public byte[] getBytes(String key) {
+		Object obj = this.get(key);
+		if(obj == null) {
+			return null;
+		}
+		if(obj instanceof byte[]) {
+			return (byte[])obj;
+		}
+		String str = StringUtils.toString(obj, CharsetConstants.CHARSET_UTF_8);
+		return ByteUtils.stringToBytes(str, CharsetConstants.CHARSET_UTF_8);
+	}
+	
+	@Override
+	public <T> T getItem(String key, Class<T> clazz) {
+		byte[] bytes = this.getBytes(key);
+		if(bytes == null) {
+			return null;
+		}
+		return JsonUtils.parseObject(ByteUtils.bytesToString(bytes, CharsetConstants.CHARSET_UTF_8), clazz);
+	}
+	
+	@Override
+	public <T> List<T> getList(String key, Class<T> clazz) {
+		byte[] bytes = this.getBytes(key);
+		if(bytes == null) {
+			return null;
+		}
+		return JsonUtils.parseArray(ByteUtils.bytesToString(bytes, CharsetConstants.CHARSET_UTF_8), clazz);
 	}
 
 	@Override
-	public void put(Object key, Object value) {
+	public void put(String key, Object value) {
 		this.map.put(key, new TimedValueWrapper<>(key, value));
 	}
 
 	@Override
-	public void put(Object key, Object value, long ttl) {
+	public void put(String key, Object value, long ttl) {
 		this.map.put(key, new TimedValueWrapper<>(key, value, ttl));
 	}
 
 	@Override
-	public boolean remove(Object key) {
-		TimedValueWrapper<Object, Object> wrapper = this.map.remove(key);
-		return wrapper != null;
+	public boolean remove(String key) {
+		return this.map.remove(key) != null;
+	}
+	
+	@Override
+	public long removes(Collection<String> keys) {
+		if(ObjectUtils.isEmpty(keys)) {
+			return 0L;
+		}
+		long count = 0L;
+		for (Object key : keys) {
+			if(this.map.remove(key) != null) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	@Override
+	public boolean exists(String key) {
+		return this.map.containsKey(key);
 	}
 
 	@Override
-	public Set<Object> keys(Object pattern) {
-		return this.map.keySet();
+	public Set<String> keys(String pattern) {
+		Set<String> keys = this.map.keySet();
+		if(StringUtils.isEmpty(pattern)) {
+			return keys;
+		}
+		return CollectionUtils.toSet(CollectionUtils.filter(keys, x -> x.equalsIgnoreCase(pattern) || RegexUtils.simpleMatch(new String[] { pattern }, x)));
 	}
 
 	@Override
-	public long size(Object pattern) {
-		return this.map.size();
+	public long size(String pattern) {
+		Set<String> keys = this.map.keySet();
+		if(StringUtils.isEmpty(pattern)) {
+			return keys.size();
+		}
+		return CollectionUtils.count(keys, x -> x.equalsIgnoreCase(pattern) || RegexUtils.simpleMatch(new String[] { pattern }, x));
 	}
 
 	@Override
@@ -129,5 +195,9 @@ public class TimedCache extends AbstractCache implements Closeable {
 		if(this.scheduledExecutorService != null) {
 			this.scheduledExecutorService.shutdownNow();
 		}
+	}
+	
+	public static void main(String[] args) {
+		
 	}
 }

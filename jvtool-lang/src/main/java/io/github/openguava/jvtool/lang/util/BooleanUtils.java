@@ -191,6 +191,36 @@ public class BooleanUtils {
     public static boolean toBoolean(final int value) {
         return value != 0;
     }
+    
+    /**
+	 * 转换为byte<br>
+	 * 如果给定的值为<code>null</code>，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 * 
+	 * @param value        被转换的值
+	 * @return 结果
+	 */
+	public static Boolean toBoolean(Object value) {
+		return toBoolean(value, null);
+	}
+	
+    /**
+	 * 转换为byte<br>
+	 * 如果给定的值为<code>null</code>，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 * 
+	 * @param value        被转换的值
+	 * @param defaultValue 转换错误时的默认值
+	 * @return 结果
+	 */
+	public static Boolean toBoolean(Object value, Boolean defaultValue) {
+		final String valueStr = StringUtils.toStringOrNull(value);
+		if (StringUtils.isEmpty(valueStr)) {
+			return defaultValue;
+		}
+		Boolean ret = BooleanUtils.toBooleanObject(valueStr);
+		return ret != null ? ret : defaultValue;
+	}
 
     /**
      * <p>Converts an int to a Boolean using the convention that {@code zero}

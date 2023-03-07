@@ -9,11 +9,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
 
@@ -81,6 +84,72 @@ public class StringUtils {
     public static String defaultString(final String str, final String defaultStr) {
         return str == null ? defaultStr : str;
     }
+    
+    /**
+     * <p>Returns either the passed in CharSequence, or if the CharSequence is
+     * whitespace, empty ("") or {@code null}, the value of {@code defaultStr}.</p>
+     *
+     * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.</p>
+     *
+     * <pre>
+     * StringUtils.defaultIfBlank(null, "NULL")  = "NULL"
+     * StringUtils.defaultIfBlank("", "NULL")    = "NULL"
+     * StringUtils.defaultIfBlank(" ", "NULL")   = "NULL"
+     * StringUtils.defaultIfBlank("bat", "NULL") = "bat"
+     * StringUtils.defaultIfBlank("", null)      = null
+     * </pre>
+     * @param <T> the specific kind of CharSequence
+     * @param str the CharSequence to check, may be null
+     * @param defaultStr  the default CharSequence to return
+     *  if the input is whitespace, empty ("") or {@code null}, may be null
+     * @return the passed in CharSequence, or the default
+     * @see StringUtils#defaultString(String, String)
+     */
+    public static <T extends CharSequence> T defaultIfBlank(final T str, final T defaultStr) {
+        return isBlank(str) ? defaultStr : str;
+    }
+
+    /**
+     * <p>Returns either the passed in CharSequence, or if the CharSequence is
+     * empty or {@code null}, the value of {@code defaultStr}.</p>
+     *
+     * <pre>
+     * StringUtils.defaultIfEmpty(null, "NULL")  = "NULL"
+     * StringUtils.defaultIfEmpty("", "NULL")    = "NULL"
+     * StringUtils.defaultIfEmpty(" ", "NULL")   = " "
+     * StringUtils.defaultIfEmpty("bat", "NULL") = "bat"
+     * StringUtils.defaultIfEmpty("", null)      = null
+     * </pre>
+     * @param <T> the specific kind of CharSequence
+     * @param str  the CharSequence to check, may be null
+     * @param defaultStr  the default CharSequence to return
+     *  if the input is empty ("") or {@code null}, may be null
+     * @return the passed in CharSequence, or the default
+     * @see StringUtils#defaultString(String, String)
+     */
+    public static <T extends CharSequence> T defaultIfEmpty(final T str, final T defaultStr) {
+        return isEmpty(str) ? defaultStr : str;
+    }
+    
+	/**
+	 * * 判断一个对象是否为空
+	 * 
+	 * @param object Object
+	 * @return true：为空 false：非空
+	 */
+	public static boolean isNull(Object object) {
+		return object == null;
+	}
+	
+	/**
+	 * * 判断一个对象是否非空
+	 * 
+	 * @param object Object
+	 * @return true：非空 false：空
+	 */
+	public static boolean isNotNull(Object object) {
+		return !isNull(object);
+	}
 
 	/********************** BEGIN isEmpty/isNotEmpty *************************/
 	
@@ -172,6 +241,15 @@ public class StringUtils {
 		return false;
 	}
 	
+	/**
+	 * 获取字符串长度
+	 * @param cs
+	 * @return
+	 */
+    public static int length(final CharSequence cs) {
+        return cs == null ? 0 : cs.length();
+    }
+	
 	/********************** BEGIN hasLength/hasText/contains *************************/
 	
 	/**
@@ -245,6 +323,32 @@ public class StringUtils {
 	public static boolean hasText(String str) {
 		return (str != null && !str.isEmpty() && containsText(str));
 	}
+	
+	/**
+	 * 判断是否包含指定的字符
+	 * @param seq
+	 * @param searchSeq
+	 * @return
+	 */
+    public static boolean contains(final CharSequence str, final CharSequence searchStr) {
+        if (str == null || searchStr == null) {
+            return false;
+        }
+        return indexOf(str, searchStr, 0, false) >= 0;
+    }
+    
+    /**
+     * 判断是否包含指定的字符(忽略大小写)
+     * @param str
+     * @param searchStr
+     * @return
+     */
+    public static boolean containsIgnoreCase(final CharSequence str, final CharSequence searchStr) {
+        if (str == null || searchStr == null) {
+            return false;
+        }
+        return indexOf(str, searchStr, 0, true) >= 0;
+    }
 
 	private static boolean containsText(CharSequence str) {
 		int strLen = str.length();
@@ -1587,6 +1691,152 @@ public class StringUtils {
 		return result;
 	}
 	
+    /**
+     * <p>Strips whitespace from the start and end of a String.</p>
+     *
+     * <p>This is similar to {@link #trim(String)} but removes whitespace.
+     * Whitespace is defined by {@link Character#isWhitespace(char)}.</p>
+     *
+     * <p>A {@code null} input String returns {@code null}.</p>
+     *
+     * <pre>
+     * StringUtils.strip(null)     = null
+     * StringUtils.strip("")       = ""
+     * StringUtils.strip("   ")    = ""
+     * StringUtils.strip("abc")    = "abc"
+     * StringUtils.strip("  abc")  = "abc"
+     * StringUtils.strip("abc  ")  = "abc"
+     * StringUtils.strip(" abc ")  = "abc"
+     * StringUtils.strip(" ab c ") = "ab c"
+     * </pre>
+     *
+     * @param str  the String to remove whitespace from, may be null
+     * @return the stripped String, {@code null} if null String input
+     */
+    public static String strip(final String str) {
+        return strip(str, null);
+    }
+    
+    /**
+     * <p>Strips any of a set of characters from the start and end of a String.
+     * This is similar to {@link String#trim()} but allows the characters
+     * to be stripped to be controlled.</p>
+     *
+     * <p>A {@code null} input String returns {@code null}.
+     * An empty string ("") input returns the empty string.</p>
+     *
+     * <p>If the stripChars String is {@code null}, whitespace is
+     * stripped as defined by {@link Character#isWhitespace(char)}.
+     * Alternatively use {@link #strip(String)}.</p>
+     *
+     * <pre>
+     * StringUtils.strip(null, *)          = null
+     * StringUtils.strip("", *)            = ""
+     * StringUtils.strip("abc", null)      = "abc"
+     * StringUtils.strip("  abc", null)    = "abc"
+     * StringUtils.strip("abc  ", null)    = "abc"
+     * StringUtils.strip(" abc ", null)    = "abc"
+     * StringUtils.strip("  abcyx", "xyz") = "  abc"
+     * </pre>
+     *
+     * @param str  the String to remove characters from, may be null
+     * @param stripChars  the characters to remove, null treated as whitespace
+     * @return the stripped String, {@code null} if null String input
+     */
+    public static String strip(String str, final String stripChars) {
+        str = stripStart(str, stripChars);
+        return stripEnd(str, stripChars);
+    }
+    
+	/**
+     * <p>Strips any of a set of characters from the start of a String.</p>
+     *
+     * <p>A {@code null} input String returns {@code null}.
+     * An empty string ("") input returns the empty string.</p>
+     *
+     * <p>If the stripChars String is {@code null}, whitespace is
+     * stripped as defined by {@link Character#isWhitespace(char)}.</p>
+     *
+     * <pre>
+     * StringUtils.stripStart(null, *)          = null
+     * StringUtils.stripStart("", *)            = ""
+     * StringUtils.stripStart("abc", "")        = "abc"
+     * StringUtils.stripStart("abc", null)      = "abc"
+     * StringUtils.stripStart("  abc", null)    = "abc"
+     * StringUtils.stripStart("abc  ", null)    = "abc  "
+     * StringUtils.stripStart(" abc ", null)    = "abc "
+     * StringUtils.stripStart("yxabc  ", "xyz") = "abc  "
+     * </pre>
+     *
+     * @param str  the String to remove characters from, may be null
+     * @param stripChars  the characters to remove, null treated as whitespace
+     * @return the stripped String, {@code null} if null String input
+     */
+    public static String stripStart(final String str, final String stripChars) {
+        final int strLen = length(str);
+        if (strLen == 0) {
+            return str;
+        }
+        int start = 0;
+        if (stripChars == null) {
+            while (start != strLen && Character.isWhitespace(str.charAt(start))) {
+                start++;
+            }
+        } else if (stripChars.isEmpty()) {
+            return str;
+        } else {
+            while (start != strLen && stripChars.indexOf(str.charAt(start)) != INDEX_NOT_FOUND) {
+                start++;
+            }
+        }
+        return str.substring(start);
+    }
+    
+    /**
+     * <p>Strips any of a set of characters from the end of a String.</p>
+     *
+     * <p>A {@code null} input String returns {@code null}.
+     * An empty string ("") input returns the empty string.</p>
+     *
+     * <p>If the stripChars String is {@code null}, whitespace is
+     * stripped as defined by {@link Character#isWhitespace(char)}.</p>
+     *
+     * <pre>
+     * StringUtils.stripEnd(null, *)          = null
+     * StringUtils.stripEnd("", *)            = ""
+     * StringUtils.stripEnd("abc", "")        = "abc"
+     * StringUtils.stripEnd("abc", null)      = "abc"
+     * StringUtils.stripEnd("  abc", null)    = "  abc"
+     * StringUtils.stripEnd("abc  ", null)    = "abc"
+     * StringUtils.stripEnd(" abc ", null)    = " abc"
+     * StringUtils.stripEnd("  abcyx", "xyz") = "  abc"
+     * StringUtils.stripEnd("120.00", ".0")   = "12"
+     * </pre>
+     *
+     * @param str  the String to remove characters from, may be null
+     * @param stripChars  the set of characters to remove, null treated as whitespace
+     * @return the stripped String, {@code null} if null String input
+     */
+    public static String stripEnd(final String str, final String stripChars) {
+        int end = length(str);
+        if (end == 0) {
+            return str;
+        }
+
+        if (stripChars == null) {
+            while (end != 0 && Character.isWhitespace(str.charAt(end - 1))) {
+                end--;
+            }
+        } else if (stripChars.isEmpty()) {
+            return str;
+        } else {
+            while (end != 0 && stripChars.indexOf(str.charAt(end - 1)) != INDEX_NOT_FOUND) {
+                end--;
+            }
+        }
+        return str.substring(0, end);
+    }
+	
 	/**
 	 * 清理空白字符
 	 *
@@ -1619,6 +1869,225 @@ public class StringUtils {
 		}
 		return sb.toString();
 	}
+	
+    /**
+     * <p>
+     * Replaces all occurrences of Strings within another String.
+     * </p>
+     *
+     * <p>
+     * A {@code null} reference passed to this method is a no-op, or if
+     * any "search string" or "string to replace" is null, that replace will be
+     * ignored. This will not repeat. For repeating replaces, call the
+     * overloaded method.
+     * </p>
+     *
+     * <pre>
+     *  StringUtils.replaceEach(null, *, *)        = null
+     *  StringUtils.replaceEach("", *, *)          = ""
+     *  StringUtils.replaceEach("aba", null, null) = "aba"
+     *  StringUtils.replaceEach("aba", new String[0], null) = "aba"
+     *  StringUtils.replaceEach("aba", null, new String[0]) = "aba"
+     *  StringUtils.replaceEach("aba", new String[]{"a"}, null)  = "aba"
+     *  StringUtils.replaceEach("aba", new String[]{"a"}, new String[]{""})  = "b"
+     *  StringUtils.replaceEach("aba", new String[]{null}, new String[]{"a"})  = "aba"
+     *  StringUtils.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"w", "t"})  = "wcte"
+     *  (example of how it does not repeat)
+     *  StringUtils.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"d", "t"})  = "dcte"
+     * </pre>
+     *
+     * @param text
+     *            text to search and replace in, no-op if null
+     * @param searchList
+     *            the Strings to search for, no-op if null
+     * @param replacementList
+     *            the Strings to replace them with, no-op if null
+     * @return the text with any replacements processed, {@code null} if
+     *         null String input
+     * @throws IllegalArgumentException
+     *             if the lengths of the arrays are not the same (null is ok,
+     *             and/or size 0)
+     * @since 2.4
+     */
+    public static String replaceEach(final String text, final String[] searchList, final String[] replacementList) {
+        return replaceEach(text, searchList, replacementList, false, 0);
+    }
+	
+	/**
+     * <p>
+     * Replace all occurrences of Strings within another String.
+     * This is a private recursive helper method for {@link #replaceEachRepeatedly(String, String[], String[])} and
+     * {@link #replaceEach(String, String[], String[])}
+     * </p>
+     *
+     * <p>
+     * A {@code null} reference passed to this method is a no-op, or if
+     * any "search string" or "string to replace" is null, that replace will be
+     * ignored.
+     * </p>
+     *
+     * <pre>
+     *  StringUtils.replaceEach(null, *, *, *, *) = null
+     *  StringUtils.replaceEach("", *, *, *, *) = ""
+     *  StringUtils.replaceEach("aba", null, null, *, *) = "aba"
+     *  StringUtils.replaceEach("aba", new String[0], null, *, *) = "aba"
+     *  StringUtils.replaceEach("aba", null, new String[0], *, *) = "aba"
+     *  StringUtils.replaceEach("aba", new String[]{"a"}, null, *, *) = "aba"
+     *  StringUtils.replaceEach("aba", new String[]{"a"}, new String[]{""}, *, >=0) = "b"
+     *  StringUtils.replaceEach("aba", new String[]{null}, new String[]{"a"}, *, >=0) = "aba"
+     *  StringUtils.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"w", "t"}, *, >=0) = "wcte"
+     *  (example of how it repeats)
+     *  StringUtils.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"d", "t"}, false, >=0) = "dcte"
+     *  StringUtils.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"d", "t"}, true, >=2) = "tcte"
+     *  StringUtils.replaceEach("abcde", new String[]{"ab", "d"}, new String[]{"d", "ab"}, *, *) = IllegalStateException
+     * </pre>
+     *
+     * @param text
+     *            text to search and replace in, no-op if null
+     * @param searchList
+     *            the Strings to search for, no-op if null
+     * @param replacementList
+     *            the Strings to replace them with, no-op if null
+     * @param repeat if true, then replace repeatedly
+     *       until there are no more possible replacements or timeToLive < 0
+     * @param timeToLive
+     *            if less than 0 then there is a circular reference and endless
+     *            loop
+     * @return the text with any replacements processed, {@code null} if
+     *         null String input
+     * @throws IllegalStateException
+     *             if the search is repeating and there is an endless loop due
+     *             to outputs of one being inputs to another
+     * @throws IllegalArgumentException
+     *             if the lengths of the arrays are not the same (null is ok,
+     *             and/or size 0)
+     * @since 2.4
+     */
+    private static String replaceEach(
+            final String text, final String[] searchList, final String[] replacementList, final boolean repeat, final int timeToLive) {
+
+        // mchyzer Performance note: This creates very few new objects (one major goal)
+        // let me know if there are performance requests, we can create a harness to measure
+
+        // if recursing, this shouldn't be less than 0
+        if (timeToLive < 0) {
+            final Set<String> searchSet = new HashSet<>(Arrays.asList(searchList));
+            final Set<String> replacementSet = new HashSet<>(Arrays.asList(replacementList));
+            searchSet.retainAll(replacementSet);
+            if (!searchSet.isEmpty()) {
+                throw new IllegalStateException("Aborting to protect against StackOverflowError - " +
+                        "output of one loop is the input of another");
+            }
+        }
+
+        if (isEmpty(text) || ArrayUtils.isEmpty(searchList) || ArrayUtils.isEmpty(replacementList) || (ArrayUtils.isNotEmpty(searchList) && timeToLive == -1)) {
+            return text;
+        }
+
+        final int searchLength = searchList.length;
+        final int replacementLength = replacementList.length;
+
+        // make sure lengths are ok, these need to be equal
+        if (searchLength != replacementLength) {
+            throw new IllegalArgumentException("Search and Replace array lengths don't match: "
+                + searchLength
+                + " vs "
+                + replacementLength);
+        }
+
+        // keep track of which still have matches
+        final boolean[] noMoreMatchesForReplIndex = new boolean[searchLength];
+
+        // index on index that the match was found
+        int textIndex = -1;
+        int replaceIndex = -1;
+        int tempIndex = -1;
+
+        // index of replace array that will replace the search string found
+        // NOTE: logic duplicated below START
+        for (int i = 0; i < searchLength; i++) {
+            if (noMoreMatchesForReplIndex[i] || isEmpty(searchList[i]) || replacementList[i] == null) {
+                continue;
+            }
+            tempIndex = text.indexOf(searchList[i]);
+
+            // see if we need to keep searching for this
+            if (tempIndex == -1) {
+                noMoreMatchesForReplIndex[i] = true;
+            } else if (textIndex == -1 || tempIndex < textIndex) {
+                textIndex = tempIndex;
+                replaceIndex = i;
+            }
+        }
+        // NOTE: logic mostly below END
+
+        // no search strings found, we are done
+        if (textIndex == -1) {
+            return text;
+        }
+
+        int start = 0;
+
+        // get a good guess on the size of the result buffer so it doesn't have to double if it goes over a bit
+        int increase = 0;
+
+        // count the replacement text elements that are larger than their corresponding text being replaced
+        for (int i = 0; i < searchList.length; i++) {
+            if (searchList[i] == null || replacementList[i] == null) {
+                continue;
+            }
+            final int greater = replacementList[i].length() - searchList[i].length();
+            if (greater > 0) {
+                increase += 3 * greater; // assume 3 matches
+            }
+        }
+        // have upper-bound at 20% increase, then let Java take over
+        increase = Math.min(increase, text.length() / 5);
+
+        final StringBuilder buf = new StringBuilder(text.length() + increase);
+
+        while (textIndex != -1) {
+
+            for (int i = start; i < textIndex; i++) {
+                buf.append(text.charAt(i));
+            }
+            buf.append(replacementList[replaceIndex]);
+
+            start = textIndex + searchList[replaceIndex].length();
+
+            textIndex = -1;
+            replaceIndex = -1;
+            // find the next earliest match
+            // NOTE: logic mostly duplicated above START
+            for (int i = 0; i < searchLength; i++) {
+                if (noMoreMatchesForReplIndex[i] || searchList[i] == null ||
+                        searchList[i].isEmpty() || replacementList[i] == null) {
+                    continue;
+                }
+                tempIndex = text.indexOf(searchList[i], start);
+
+                // see if we need to keep searching for this
+                if (tempIndex == -1) {
+                    noMoreMatchesForReplIndex[i] = true;
+                } else if (textIndex == -1 || tempIndex < textIndex) {
+                    textIndex = tempIndex;
+                    replaceIndex = i;
+                }
+            }
+            // NOTE: logic duplicated above END
+
+        }
+        final int textLength = text.length();
+        for (int i = start; i < textLength; i++) {
+            buf.append(text.charAt(i));
+        }
+        final String result = buf.toString();
+        if (!repeat) {
+            return result;
+        }
+
+        return replaceEach(result, searchList, replacementList, repeat, timeToLive - 1);
+    }
 	
 	/**
 	 * 替换字符串中的指定字符串
@@ -1745,15 +2214,72 @@ public class StringUtils {
         return new String(chs, 0, count);
     }
 	
+    /**
+     * <p>Check if a CharSequence starts with any of the provided case-sensitive prefixes.</p>
+     *
+     * <pre>
+     * StringUtils.startsWithAny(null, null)      = false
+     * StringUtils.startsWithAny(null, new String[] {"abc"})  = false
+     * StringUtils.startsWithAny("abcxyz", null)     = false
+     * StringUtils.startsWithAny("abcxyz", new String[] {""}) = true
+     * StringUtils.startsWithAny("abcxyz", new String[] {"abc"}) = true
+     * StringUtils.startsWithAny("abcxyz", new String[] {null, "xyz", "abc"}) = true
+     * StringUtils.startsWithAny("abcxyz", null, "xyz", "ABCX") = false
+     * StringUtils.startsWithAny("ABCXYZ", null, "xyz", "abc") = false
+     * </pre>
+     *
+     * @param sequence the CharSequence to check, may be null
+     * @param searchStrings the case-sensitive CharSequence prefixes, may be empty or contain {@code null}
+     * @see StringUtils#startsWith(CharSequence, CharSequence)
+     * @return {@code true} if the input {@code sequence} is {@code null} AND no {@code searchStrings} are provided, or
+     *   the input {@code sequence} begins with any of the provided case-sensitive {@code searchStrings}.
+     * @since 2.5
+     * @since 3.0 Changed signature from startsWithAny(String, String[]) to startsWithAny(CharSequence, CharSequence...)
+     */
+    public static boolean startsWithAny(final CharSequence sequence, final CharSequence... searchStrings) {
+        if (isEmpty(sequence) || ArrayUtils.isEmpty(searchStrings)) {
+            return false;
+        }
+        for (final CharSequence searchString : searchStrings) {
+            if (startsWith(sequence, searchString)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
 	/**
-	 * 是否以指定字符串开头，忽略大小写
+	 * 
 	 *
 	 * @param str    被监测字符串
 	 * @param prefix 开头字符串
 	 * @return 是否以指定字符串开头
 	 */
-	public static boolean startWithIgnoreCase(CharSequence str, CharSequence prefix) {
-		return startWith(str, prefix, true);
+    /**
+     * <p>是否以指定字符串开头，忽略大小写</p>
+     * <p>Case insensitive check if a CharSequence starts with a specified prefix.</p>
+     *
+     * <p>{@code null}s are handled without exceptions. Two {@code null}
+     * references are considered to be equal. The comparison is case insensitive.</p>
+     *
+     * <pre>
+     * StringUtils.startsWithIgnoreCase(null, null)      = true
+     * StringUtils.startsWithIgnoreCase(null, "abc")     = false
+     * StringUtils.startsWithIgnoreCase("abcdef", null)  = false
+     * StringUtils.startsWithIgnoreCase("abcdef", "abc") = true
+     * StringUtils.startsWithIgnoreCase("ABCDEF", "abc") = true
+     * </pre>
+     *
+     * @see java.lang.String#startsWith(String)
+     * @param str <p>被监测字符串</p>the CharSequence to check, may be null
+     * @param prefix <p>开头字符串</p>the prefix to find, may be null
+     * @return <p>是否以指定字符串开头</p>{@code true} if the CharSequence starts with the prefix, case insensitive, or
+     *  both {@code null}
+     * @since 2.4
+     * @since 3.0 Changed signature from startsWithIgnoreCase(String, String) to startsWithIgnoreCase(CharSequence, CharSequence)
+     */
+	public static boolean startsWithIgnoreCase(CharSequence str, CharSequence prefix) {
+		return startsWith(str, prefix, true);
 	}
 	
 	/**
@@ -1763,8 +2289,8 @@ public class StringUtils {
 	 * @param prefix 开头字符串
 	 * @return 是否以指定字符串开头
 	 */
-	public static boolean startWith(CharSequence str, CharSequence prefix) {
-		return startWith(str, prefix, false);
+	public static boolean startsWith(CharSequence str, CharSequence prefix) {
+		return startsWith(str, prefix, false);
 	}
 	
 	/**
@@ -1776,8 +2302,8 @@ public class StringUtils {
 	 * @param isIgnoreCase 是否忽略大小写
 	 * @return 是否以指定字符串开头
 	 */
-	public static boolean startWith(CharSequence str, CharSequence prefix, boolean isIgnoreCase) {
-		return startWith(str, prefix, isIgnoreCase, false);
+	public static boolean startsWith(CharSequence str, CharSequence prefix, boolean isIgnoreCase) {
+		return startsWith(str, prefix, isIgnoreCase, false);
 	}
 	
 	/**
@@ -1790,7 +2316,7 @@ public class StringUtils {
 	 * @param ignoreEquals 是否忽略字符串相等的情况
 	 * @return 是否以指定字符串开头
 	 */
-	public static boolean startWith(CharSequence str, CharSequence prefix, boolean ignoreCase, boolean ignoreEquals) {
+	public static boolean startsWith(CharSequence str, CharSequence prefix, boolean ignoreCase, boolean ignoreEquals) {
 		if (null == str || null == prefix) {
 			if (!ignoreEquals) {
 				return false;
@@ -1816,19 +2342,69 @@ public class StringUtils {
 	 * @param suffix 结尾字符串
 	 * @return 是否以指定字符串结尾
 	 */
-	public static boolean endWith(CharSequence str, CharSequence suffix) {
-		return endWith(str, suffix, false);
+	public static boolean endsWith(CharSequence str, CharSequence suffix) {
+		return endsWith(str, suffix, false);
 	}
 	
 	/**
-	 * 是否以指定字符串结尾，忽略大小写
-	 *
-	 * @param str    被监测字符串
-	 * @param suffix 结尾字符串
-	 * @return 是否以指定字符串结尾
-	 */
-	public static boolean endWithIgnoreCase(CharSequence str, CharSequence suffix) {
-		return endWith(str, suffix, true);
+     * <p>Check if a CharSequence ends with any of the provided case-sensitive suffixes.</p>
+     *
+     * <pre>
+     * StringUtils.endsWithAny(null, null)      = false
+     * StringUtils.endsWithAny(null, new String[] {"abc"})  = false
+     * StringUtils.endsWithAny("abcxyz", null)     = false
+     * StringUtils.endsWithAny("abcxyz", new String[] {""}) = true
+     * StringUtils.endsWithAny("abcxyz", new String[] {"xyz"}) = true
+     * StringUtils.endsWithAny("abcxyz", new String[] {null, "xyz", "abc"}) = true
+     * StringUtils.endsWithAny("abcXYZ", "def", "XYZ") = true
+     * StringUtils.endsWithAny("abcXYZ", "def", "xyz") = false
+     * </pre>
+     *
+     * @param sequence  the CharSequence to check, may be null
+     * @param searchStrings the case-sensitive CharSequences to find, may be empty or contain {@code null}
+     * @see StringUtils#endsWith(CharSequence, CharSequence)
+     * @return {@code true} if the input {@code sequence} is {@code null} AND no {@code searchStrings} are provided, or
+     *   the input {@code sequence} ends in any of the provided case-sensitive {@code searchStrings}.
+     * @since 3.0
+     */
+    public static boolean endsWithAny(final CharSequence sequence, final CharSequence... searchStrings) {
+        if (isEmpty(sequence) || ArrayUtils.isEmpty(searchStrings)) {
+            return false;
+        }
+        for (final CharSequence searchString : searchStrings) {
+            if (endsWith(sequence, searchString)) {
+                return true;
+            }
+        }
+        return false;
+    }
+	
+    /**
+     * <p>是否以指定字符串结尾，忽略大小写</p>
+     * <p>Case insensitive check if a CharSequence ends with a specified suffix.</p>
+     *
+     * <p>{@code null}s are handled without exceptions. Two {@code null}
+     * references are considered to be equal. The comparison is case insensitive.</p>
+     *
+     * <pre>
+     * StringUtils.endsWithIgnoreCase(null, null)      = true
+     * StringUtils.endsWithIgnoreCase(null, "def")     = false
+     * StringUtils.endsWithIgnoreCase("abcdef", null)  = false
+     * StringUtils.endsWithIgnoreCase("abcdef", "def") = true
+     * StringUtils.endsWithIgnoreCase("ABCDEF", "def") = true
+     * StringUtils.endsWithIgnoreCase("ABCDEF", "cde") = false
+     * </pre>
+     *
+     * @see java.lang.String#endsWith(String)
+     * @param str <p>被监测字符串</p>the CharSequence to check, may be null
+     * @param suffix <p>结尾字符串</p>the suffix to find, may be null
+     * @return <p>是否以指定字符串结尾</p>{@code true} if the CharSequence ends with the suffix, case insensitive, or
+     *  both {@code null}
+     * @since 2.4
+     * @since 3.0 Changed signature from endsWithIgnoreCase(String, String) to endsWithIgnoreCase(CharSequence, CharSequence)
+     */
+	public static boolean endsWithIgnoreCase(CharSequence str, CharSequence suffix) {
+		return endsWith(str, suffix, true);
 	}
 	
 	/**
@@ -1840,7 +2416,7 @@ public class StringUtils {
 	 * @param isIgnoreCase 是否忽略大小写
 	 * @return 是否以指定字符串结尾
 	 */
-	public static boolean endWith(CharSequence str, CharSequence suffix, boolean isIgnoreCase) {
+	public static boolean endsWith(CharSequence str, CharSequence suffix, boolean isIgnoreCase) {
 		if (null == str || null == suffix) {
 			return null == str && null == suffix;
 		}
@@ -2026,6 +2602,43 @@ public class StringUtils {
 	}
 	
 	/**
+	* 截取字符串(同sub)
+	* 改进JDK subString<br>
+	* index从0开始计算，最后一个字符为-1<br>
+	 * 如果from和to位置一样，返回 "" <br>
+	* 如果from或to为负数，则按照length从后向前数位置，如果绝对值大于字符串长度，则from归到0，to归到length<br>
+	* 如果经过修正的index中from大于to，则互换from和to example: <br>
+	* abcdefgh 2 3 =》 c <br>
+	* abcdefgh 2 -3 =》 cde <br>
+	*
+	* @param str              String
+	* @param fromIndexInclude 开始的index（包括）
+	* @return 字串
+	*/
+	public static String substring(CharSequence str, int fromIndexInclude) {
+		return sub(str, fromIndexInclude, str != null ? str.length() : 0);
+	}
+	
+	/**
+	* 截取字符串(同sub)
+	* 改进JDK subString<br>
+	* index从0开始计算，最后一个字符为-1<br>
+	 * 如果from和to位置一样，返回 "" <br>
+	* 如果from或to为负数，则按照length从后向前数位置，如果绝对值大于字符串长度，则from归到0，to归到length<br>
+	* 如果经过修正的index中from大于to，则互换from和to example: <br>
+	* abcdefgh 2 3 =》 c <br>
+	* abcdefgh 2 -3 =》 cde <br>
+	*
+	* @param str              String
+	* @param fromIndexInclude 开始的index（包括）
+	* @param toIndexExclude   结束的index（不包括）
+	* @return 字串
+	*/
+	public static String substring(CharSequence str, int fromIndexInclude, int toIndexExclude) {
+		return sub(str, fromIndexInclude, toIndexExclude);
+	}
+	
+	/**
 	* 截取字符串
 	* 改进JDK subString<br>
 	* index从0开始计算，最后一个字符为-1<br>
@@ -2149,6 +2762,270 @@ public class StringUtils {
 		}
 		return null;
 	}
+	
+    /**
+     * <p>Splits the provided text into an array, using whitespace as the
+     * separator.
+     * Whitespace is defined by {@link Character#isWhitespace(char)}.</p>
+     *
+     * <p>The separator is not included in the returned String array.
+     * Adjacent separators are treated as one separator.
+     * For more control over the split use the StrTokenizer class.</p>
+     *
+     * <p>A {@code null} input String returns {@code null}.</p>
+     *
+     * <pre>
+     * StringUtils.split(null)       = null
+     * StringUtils.split("")         = []
+     * StringUtils.split("abc def")  = ["abc", "def"]
+     * StringUtils.split("abc  def") = ["abc", "def"]
+     * StringUtils.split(" abc ")    = ["abc"]
+     * </pre>
+     *
+     * @param str  the String to parse, may be null
+     * @return an array of parsed Strings, {@code null} if null String input
+     */
+    public static String[] split(final String str) {
+        return split(str, null, -1);
+    }
+    
+    /**
+     * <p>Splits the provided text into an array, separator specified.
+     * This is an alternative to using StringTokenizer.</p>
+     *
+     * <p>The separator is not included in the returned String array.
+     * Adjacent separators are treated as one separator.
+     * For more control over the split use the StrTokenizer class.</p>
+     *
+     * <p>A {@code null} input String returns {@code null}.</p>
+     *
+     * <pre>
+     * StringUtils.split(null, *)         = null
+     * StringUtils.split("", *)           = []
+     * StringUtils.split("a.b.c", '.')    = ["a", "b", "c"]
+     * StringUtils.split("a..b.c", '.')   = ["a", "b", "c"]
+     * StringUtils.split("a:b:c", '.')    = ["a:b:c"]
+     * StringUtils.split("a b c", ' ')    = ["a", "b", "c"]
+     * </pre>
+     *
+     * @param str  the String to parse, may be null
+     * @param separatorChar  the character used as the delimiter
+     * @return an array of parsed Strings, {@code null} if null String input
+     * @since 2.0
+     */
+    public static String[] split(final String str, final char separatorChar) {
+        return splitWorker(str, separatorChar, false);
+    }
+    
+    /**
+     * <p>Splits the provided text into an array, separators specified.
+     * This is an alternative to using StringTokenizer.</p>
+     *
+     * <p>The separator is not included in the returned String array.
+     * Adjacent separators are treated as one separator.
+     * For more control over the split use the StrTokenizer class.</p>
+     *
+     * <p>A {@code null} input String returns {@code null}.
+     * A {@code null} separatorChars splits on whitespace.</p>
+     *
+     * <pre>
+     * StringUtils.split(null, *)         = null
+     * StringUtils.split("", *)           = []
+     * StringUtils.split("abc def", null) = ["abc", "def"]
+     * StringUtils.split("abc def", " ")  = ["abc", "def"]
+     * StringUtils.split("abc  def", " ") = ["abc", "def"]
+     * StringUtils.split("ab:cd:ef", ":") = ["ab", "cd", "ef"]
+     * </pre>
+     *
+     * @param str  the String to parse, may be null
+     * @param separatorChars  the characters used as the delimiters,
+     *  {@code null} splits on whitespace
+     * @return an array of parsed Strings, {@code null} if null String input
+     */
+    public static String[] split(final String str, final String separatorChars) {
+        return splitWorker(str, separatorChars, -1, false);
+    }
+    
+    /**
+     * <p>Splits the provided text into an array with a maximum length,
+     * separators specified.</p>
+     *
+     * <p>The separator is not included in the returned String array.
+     * Adjacent separators are treated as one separator.</p>
+     *
+     * <p>A {@code null} input String returns {@code null}.
+     * A {@code null} separatorChars splits on whitespace.</p>
+     *
+     * <p>If more than {@code max} delimited substrings are found, the last
+     * returned string includes all characters after the first {@code max - 1}
+     * returned strings (including separator characters).</p>
+     *
+     * <pre>
+     * StringUtils.split(null, *, *)            = null
+     * StringUtils.split("", *, *)              = []
+     * StringUtils.split("ab cd ef", null, 0)   = ["ab", "cd", "ef"]
+     * StringUtils.split("ab   cd ef", null, 0) = ["ab", "cd", "ef"]
+     * StringUtils.split("ab:cd:ef", ":", 0)    = ["ab", "cd", "ef"]
+     * StringUtils.split("ab:cd:ef", ":", 2)    = ["ab", "cd:ef"]
+     * </pre>
+     *
+     * @param str  the String to parse, may be null
+     * @param separatorChars  the characters used as the delimiters,
+     *  {@code null} splits on whitespace
+     * @param max  the maximum number of elements to include in the
+     *  array. A zero or negative value implies no limit
+     * @return an array of parsed Strings, {@code null} if null String input
+     */
+    public static String[] split(final String str, final String separatorChars, final int max) {
+        return splitWorker(str, separatorChars, max, false);
+    }
+    
+    /**
+     * Performs the logic for the {@code split} and
+     * {@code splitPreserveAllTokens} methods that do not return a
+     * maximum array length.
+     *
+     * @param str  the String to parse, may be {@code null}
+     * @param separatorChar the separate character
+     * @param preserveAllTokens if {@code true}, adjacent separators are
+     * treated as empty token separators; if {@code false}, adjacent
+     * separators are treated as one separator.
+     * @return an array of parsed Strings, {@code null} if null String input
+     */
+    private static String[] splitWorker(final String str, final char separatorChar, final boolean preserveAllTokens) {
+        // Performance tuned for 2.0 (JDK1.4)
+
+        if (str == null) {
+            return null;
+        }
+        final int len = str.length();
+        if (len == 0) {
+            return new String[0];
+        }
+        final List<String> list = new ArrayList<>();
+        int i = 0;
+        int start = 0;
+        boolean match = false;
+        boolean lastMatch = false;
+        while (i < len) {
+            if (str.charAt(i) == separatorChar) {
+                if (match || preserveAllTokens) {
+                    list.add(str.substring(start, i));
+                    match = false;
+                    lastMatch = true;
+                }
+                start = ++i;
+                continue;
+            }
+            lastMatch = false;
+            match = true;
+            i++;
+        }
+        if (match || preserveAllTokens && lastMatch) {
+            list.add(str.substring(start, i));
+        }
+        return list.toArray(new String[0]);
+    }
+    
+    /**
+     * Performs the logic for the {@code split} and
+     * {@code splitPreserveAllTokens} methods that return a maximum array
+     * length.
+     *
+     * @param str  the String to parse, may be {@code null}
+     * @param separatorChars the separate character
+     * @param max  the maximum number of elements to include in the
+     *  array. A zero or negative value implies no limit.
+     * @param preserveAllTokens if {@code true}, adjacent separators are
+     * treated as empty token separators; if {@code false}, adjacent
+     * separators are treated as one separator.
+     * @return an array of parsed Strings, {@code null} if null String input
+     */
+    private static String[] splitWorker(final String str, final String separatorChars, final int max, final boolean preserveAllTokens) {
+        // Performance tuned for 2.0 (JDK1.4)
+        // Direct code is quicker than StringTokenizer.
+        // Also, StringTokenizer uses isSpace() not isWhitespace()
+
+        if (str == null) {
+            return null;
+        }
+        final int len = str.length();
+        if (len == 0) {
+            return new String[0];
+        }
+        final List<String> list = new ArrayList<>();
+        int sizePlus1 = 1;
+        int i = 0;
+        int start = 0;
+        boolean match = false;
+        boolean lastMatch = false;
+        if (separatorChars == null) {
+            // Null separator means use whitespace
+            while (i < len) {
+                if (Character.isWhitespace(str.charAt(i))) {
+                    if (match || preserveAllTokens) {
+                        lastMatch = true;
+                        if (sizePlus1++ == max) {
+                            i = len;
+                            lastMatch = false;
+                        }
+                        list.add(str.substring(start, i));
+                        match = false;
+                    }
+                    start = ++i;
+                    continue;
+                }
+                lastMatch = false;
+                match = true;
+                i++;
+            }
+        } else if (separatorChars.length() == 1) {
+            // Optimise 1 character case
+            final char sep = separatorChars.charAt(0);
+            while (i < len) {
+                if (str.charAt(i) == sep) {
+                    if (match || preserveAllTokens) {
+                        lastMatch = true;
+                        if (sizePlus1++ == max) {
+                            i = len;
+                            lastMatch = false;
+                        }
+                        list.add(str.substring(start, i));
+                        match = false;
+                    }
+                    start = ++i;
+                    continue;
+                }
+                lastMatch = false;
+                match = true;
+                i++;
+            }
+        } else {
+            // standard case
+            while (i < len) {
+                if (separatorChars.indexOf(str.charAt(i)) >= 0) {
+                    if (match || preserveAllTokens) {
+                        lastMatch = true;
+                        if (sizePlus1++ == max) {
+                            i = len;
+                            lastMatch = false;
+                        }
+                        list.add(str.substring(start, i));
+                        match = false;
+                    }
+                    start = ++i;
+                    continue;
+                }
+                lastMatch = false;
+                match = true;
+                i++;
+            }
+        }
+        if (match || preserveAllTokens && lastMatch) {
+            list.add(str.substring(start, i));
+        }
+        return list.toArray(new String[0]);
+    }
 	
 	/**
 	 * 格式化字符串<br>
@@ -2302,6 +3179,66 @@ public class StringUtils {
 			return str1.toString().contentEquals(str2);
 		}
 	}
+	
+    /**
+     * <p>Compares given {@code string} to a CharSequences vararg of {@code searchStrings},
+     * returning {@code true} if the {@code string} is equal to any of the {@code searchStrings}.</p>
+     *
+     * <pre>
+     * StringUtils.equalsAny(null, (CharSequence[]) null) = false
+     * StringUtils.equalsAny(null, null, null)    = true
+     * StringUtils.equalsAny(null, "abc", "def")  = false
+     * StringUtils.equalsAny("abc", null, "def")  = false
+     * StringUtils.equalsAny("abc", "abc", "def") = true
+     * StringUtils.equalsAny("abc", "ABC", "DEF") = false
+     * </pre>
+     *
+     * @param string to compare, may be {@code null}.
+     * @param searchStrings a vararg of strings, may be {@code null}.
+     * @return {@code true} if the string is equal (case-sensitive) to any other element of {@code searchStrings};
+     * {@code false} if {@code searchStrings} is null or contains no matches.
+     * @since 3.5
+     */
+    public static boolean equalsAny(final CharSequence string, final CharSequence... searchStrings) {
+        if (ArrayUtils.isNotEmpty(searchStrings)) {
+            for (final CharSequence next : searchStrings) {
+                if (equals(string, next)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * <p>Compares given {@code string} to a CharSequences vararg of {@code searchStrings},
+     * returning {@code true} if the {@code string} is equal to any of the {@code searchStrings}, ignoring case.</p>
+     *
+     * <pre>
+     * StringUtils.equalsAnyIgnoreCase(null, (CharSequence[]) null) = false
+     * StringUtils.equalsAnyIgnoreCase(null, null, null)    = true
+     * StringUtils.equalsAnyIgnoreCase(null, "abc", "def")  = false
+     * StringUtils.equalsAnyIgnoreCase("abc", null, "def")  = false
+     * StringUtils.equalsAnyIgnoreCase("abc", "abc", "def") = true
+     * StringUtils.equalsAnyIgnoreCase("abc", "ABC", "DEF") = true
+     * </pre>
+     *
+     * @param string to compare, may be {@code null}.
+     * @param searchStrings a vararg of strings, may be {@code null}.
+     * @return {@code true} if the string is equal (case-insensitive) to any other element of {@code searchStrings};
+     * {@code false} if {@code searchStrings} is null or contains no matches.
+     * @since 3.5
+     */
+    public static boolean equalsAnyIgnoreCase(final CharSequence string, final CharSequence...searchStrings) {
+        if (ArrayUtils.isNotEmpty(searchStrings)) {
+            for (final CharSequence next : searchStrings) {
+                if (equalsIgnoreCase(string, next)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 	
 	/**
 	 * 截取两个字符串的不同部分（长度一致），判断截取的子串是否相同<br>
@@ -2550,6 +3487,16 @@ public class StringUtils {
 			}
 		}
 		return toStringArray(result);
+	}
+	
+	/**
+	 * 字符串转字符串数组
+	 * @param str
+	 * @param delimiter
+	 * @return
+	 */
+	public static String[] toStringArray(String str, String delimiter) {
+		return delimitedListToStringArray(str, delimiter);
 	}
 	
 	/**
@@ -2852,6 +3799,47 @@ public class StringUtils {
 		return str.toString().getBytes(charset);
 	}
 	
+    /**
+     * 转换为小写字符
+     * @param str
+     * @return
+     */
+    public static String toLowerCase(final String str) {
+        if (str == null) {
+            return null;
+        }
+        return str.toLowerCase();
+    }
+    
+    /**
+     * 转换为小写字符
+     * @param strs
+     * @return
+     */
+    public static String[] toLowerCase(final String[] strs) {
+        if (strs == null || strs.length == 0) {
+            return null;
+        }
+        String[] res = new String[strs.length];
+        for (int i=0; i < strs.length; i++) {
+          res[i] = strs[i].toLowerCase();
+        }
+        return res;
+    }
+
+    /**
+     * 转换为小写字符
+     * @param str
+     * @param locale
+     * @return
+     */
+    public static String toLowerCase(final String str, final Locale locale) {
+        if (str == null) {
+            return null;
+        }
+        return str.toLowerCase(locale != null ? locale : Locale.getDefault());
+    }
+	
 	/**
 	 * 查找指定字符串是否包含指定字符串列表中的任意一个字符串，如果包含返回找到的第一个字符串
 	 *
@@ -2888,7 +3876,187 @@ public class StringUtils {
 		return sb.toString();
 	}
 	
+    /**
+     * <p>首字母大写</p>
+     * <p>Capitalizes a String changing the first character to title case as
+     * per {@link Character#toTitleCase(int)}. No other characters are changed.</p>
+     *
+     * <p>For a word based algorithm, see {@link org.apache.commons.lang3.text.WordUtils#capitalize(String)}.
+     * A {@code null} input String returns {@code null}.</p>
+     *
+     * <pre>
+     * StringUtils.capitalize(null)  = null
+     * StringUtils.capitalize("")    = ""
+     * StringUtils.capitalize("cat") = "Cat"
+     * StringUtils.capitalize("cAt") = "CAt"
+     * StringUtils.capitalize("'cat'") = "'cat'"
+     * </pre>
+     *
+     * @param str the String to capitalize, may be null
+     * @return the capitalized String, {@code null} if null String input
+     * @see org.apache.commons.lang3.text.WordUtils#capitalize(String)
+     * @see #uncapitalize(String)
+     * @since 2.0
+     */
+    public static String capitalize(final String str) {
+        final int strLen = length(str);
+        if (strLen == 0) {
+            return str;
+        }
+
+        final int firstCodepoint = str.codePointAt(0);
+        final int newCodePoint = Character.toTitleCase(firstCodepoint);
+        if (firstCodepoint == newCodePoint) {
+            // already capitalized
+            return str;
+        }
+
+        final int[] newCodePoints = new int[strLen]; // cannot be longer than the char array
+        int outOffset = 0;
+        newCodePoints[outOffset++] = newCodePoint; // copy the first codepoint
+        for (int inOffset = Character.charCount(firstCodepoint); inOffset < strLen; ) {
+            final int codepoint = str.codePointAt(inOffset);
+            newCodePoints[outOffset++] = codepoint; // copy the remaining ones
+            inOffset += Character.charCount(codepoint);
+         }
+        return new String(newCodePoints, 0, outOffset);
+    }
+    
+    /**
+     * <p>首字母小写</p>
+     * <p>Uncapitalizes a String, changing the first character to lower case as
+     * per {@link Character#toLowerCase(int)}. No other characters are changed.</p>
+     *
+     * <p>For a word based algorithm, see {@link org.apache.commons.lang3.text.WordUtils#uncapitalize(String)}.
+     * A {@code null} input String returns {@code null}.</p>
+     *
+     * <pre>
+     * StringUtils.uncapitalize(null)  = null
+     * StringUtils.uncapitalize("")    = ""
+     * StringUtils.uncapitalize("cat") = "cat"
+     * StringUtils.uncapitalize("Cat") = "cat"
+     * StringUtils.uncapitalize("CAT") = "cAT"
+     * </pre>
+     *
+     * @param str the String to uncapitalize, may be null
+     * @return the uncapitalized String, {@code null} if null String input
+     * @see org.apache.commons.lang3.text.WordUtils#uncapitalize(String)
+     * @see #capitalize(String)
+     * @since 2.0
+     */
+    public static String uncapitalize(final String str) {
+        final int strLen = length(str);
+        if (strLen == 0) {
+            return str;
+        }
+
+        final int firstCodepoint = str.codePointAt(0);
+        final int newCodePoint = Character.toLowerCase(firstCodepoint);
+        if (firstCodepoint == newCodePoint) {
+            // already capitalized
+            return str;
+        }
+
+        final int[] newCodePoints = new int[strLen]; // cannot be longer than the char array
+        int outOffset = 0;
+        newCodePoints[outOffset++] = newCodePoint; // copy the first codepoint
+        for (int inOffset = Character.charCount(firstCodepoint); inOffset < strLen; ) {
+            final int codepoint = str.codePointAt(inOffset);
+            newCodePoints[outOffset++] = codepoint; // copy the remaining ones
+            inOffset += Character.charCount(codepoint);
+         }
+        return new String(newCodePoints, 0, outOffset);
+    }
+	
     private static StringBuilder newStringBuilder(final int noOfItems) {
         return new StringBuilder(noOfItems * 16);
+    }
+    
+    /**
+     * <p>判断字符串是否为数字</p>
+     * <p>Checks if the CharSequence contains only Unicode digits.
+     * A decimal point is not a Unicode digit and returns false.</p>
+     *
+     * <p>{@code null} will return {@code false}.
+     * An empty CharSequence (length()=0) will return {@code false}.</p>
+     *
+     * <p>Note that the method does not allow for a leading sign, either positive or negative.
+     * Also, if a String passes the numeric test, it may still generate a NumberFormatException
+     * when parsed by Integer.parseInt or Long.parseLong, e.g. if the value is outside the range
+     * for int or long respectively.</p>
+     *
+     * <pre>
+     * StringUtils.isNumeric(null)   = false
+     * StringUtils.isNumeric("")     = false
+     * StringUtils.isNumeric("  ")   = false
+     * StringUtils.isNumeric("123")  = true
+     * StringUtils.isNumeric("\u0967\u0968\u0969")  = true
+     * StringUtils.isNumeric("12 3") = false
+     * StringUtils.isNumeric("ab2c") = false
+     * StringUtils.isNumeric("12-3") = false
+     * StringUtils.isNumeric("12.3") = false
+     * StringUtils.isNumeric("-123") = false
+     * StringUtils.isNumeric("+123") = false
+     * </pre>
+     *
+     * @param cs  the CharSequence to check, may be null
+     * @return {@code true} if only contains digits, and is non-null
+     * @since 3.0 Changed signature from isNumeric(String) to isNumeric(CharSequence)
+     * @since 3.0 Changed "" to return false and not true
+     */
+    public static boolean isNumeric(final CharSequence cs) {
+        if (isEmpty(cs)) {
+            return false;
+        }
+        final int sz = cs.length();
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isDigit(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+	/**
+	 * 数字左边补齐0，使之达到指定长度。注意，如果数字转换为字符串后，长度大于size，则只保留 最后size个字符。
+	 * 
+	 * @param num  数字对象
+	 * @param size 字符串指定长度
+	 * @return 返回数字的字符串格式，该字符串为指定长度。
+	 */
+	public static final String padLeft(final Number num, final int size) {
+		return padLeft(num.toString(), size, '0');
+	}
+
+	/**
+	 * 字符串左补齐。如果原始字符串s长度大于size，则只保留最后size个字符。
+	 * 
+	 * @param s    原始字符串
+	 * @param size 字符串指定长度
+	 * @param c    用于补齐的字符
+	 * @return 返回指定长度的字符串，由原字符串左补齐或截取得到。
+	 */
+	public static final String padLeft(final String s, final int size, final char c) {
+		final StringBuilder sb = new StringBuilder(size);
+		if (s != null) {
+			final int len = s.length();
+			if (s.length() <= size) {
+				for (int i = size - len; i > 0; i--) {
+					sb.append(c);
+				}
+				sb.append(s);
+			} else {
+				return s.substring(len - size, len);
+			}
+		} else {
+			for (int i = size; i > 0; i--) {
+				sb.append(c);
+			}
+		}
+		return sb.toString();
+	}
+    
+    public static void main(String[] args) {
+    	
     }
 }

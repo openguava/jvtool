@@ -41,6 +41,26 @@ public class R<T> extends Result<T> {
 		return newResult(null, code, msg);
 	}
 
+	public static <T> R<T> setWarn() {
+		return newResult(null, IResult.STATUS_CODE_WARN, IResult.MSG_ERROR);
+	}
+
+	public static <T> R<T> setWarn(String msg) {
+		return newResult(null, IResult.STATUS_CODE_WARN, msg);
+	}
+
+	public static <T> R<T> setWarn(T data) {
+		return newResult(data, IResult.STATUS_CODE_WARN, IResult.MSG_ERROR);
+	}
+
+	public static <T> R<T> setWarn(T data, String msg) {
+		return newResult(data, IResult.STATUS_CODE_WARN, msg);
+	}
+
+	public static <T> R<T> setWarn(int code, String msg) {
+		return newResult(null, code, msg);
+	}
+	
 	private static <T> R<T> newResult(T data, int code, String msg) {
 		R<T> result = new R<>();
 		result.setResult(data, code, msg);

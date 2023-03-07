@@ -1,4 +1,4 @@
 @echo off
-TITLE install
+TITLE package
 mvn clean package -X
 @echo on

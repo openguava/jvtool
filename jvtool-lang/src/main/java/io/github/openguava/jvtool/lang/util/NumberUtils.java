@@ -18,6 +18,83 @@ public class NumberUtils {
 	private static final int DEFAULT_DIVIDE_SCALE = 10;
 	
 	/**
+	 * 将指定字符串转换为{@link Number} 对象<br>
+	 * 此方法不支持科学计数法
+	 *
+	 * @param numberStr Number字符串
+	 * @return Number对象
+	 * @throws NumberFormatException 包装了{@link ParseException}，当给定的数字字符串无法解析时抛出
+	 */
+	public static Number parseNumber(String numberStr) {
+		if(StringUtils.startsWithIgnoreCase(numberStr, "0x")){
+			// 0x04表示16进制数
+			return Long.parseLong(numberStr.substring(2), 16);
+		}
+		try {
+			final NumberFormat format = NumberFormat.getInstance();
+			if (format instanceof DecimalFormat) {
+				// issue#1818@Github
+				// 当字符串数字超出double的长度时，会导致截断，此处使用BigDecimal接收
+				((DecimalFormat) format).setParseBigDecimal(true);
+			}
+			return format.parse(numberStr);
+		} catch (ParseException e) {
+			final NumberFormatException nfe = new NumberFormatException(e.getMessage());
+			nfe.initCause(e);
+			throw nfe;
+		}
+	}
+	
+	/**
+     * 转换为Number<br>
+     * 如果给定的值为空，或者转换失败，返回默认值<code>null</code><br>
+     * 转换失败不会报错
+     *
+     * @param value 被转换的值
+     * @return 结果
+     */
+    public static Number toNumber(Object value) {
+        return toNumber(value, null);
+    }
+    
+	/**
+	 * 转换为Number<br>
+	 * 如果给定的值为空，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 *
+	 * @param value        被转换的值
+	 * @param defaultValue 转换错误时的默认值
+	 * @return 结果
+	 */
+	public static Number toNumber(Object value, Number defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+		if (value instanceof Number) {
+			return (Number) value;
+		}
+		final String valueStr = StringUtils.toStringOrNull(value);
+		if (StringUtils.isEmpty(valueStr)) {
+			return defaultValue;
+		}
+		try {
+			if(StringUtils.startsWithIgnoreCase(valueStr, "0x")){
+				// 0x04表示16进制数
+				return Long.parseLong(valueStr.substring(2), 16);
+			}
+			final NumberFormat format = NumberFormat.getInstance();
+			if (format instanceof DecimalFormat) {
+				// issue#1818@Github
+				// 当字符串数字超出double的长度时，会导致截断，此处使用BigDecimal接收
+				((DecimalFormat) format).setParseBigDecimal(true);
+			}
+			return format.parse(valueStr);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	/**
 	 * 解析转换数字字符串为int型数字，规则如下：
 	 *
 	 * <pre>
@@ -36,7 +113,7 @@ public class NumberUtils {
 		if (StringUtils.isBlank(number)) {
 			return 0;
 		}
-		if (StringUtils.startWithIgnoreCase(number, "0x")) {
+		if (StringUtils.startsWithIgnoreCase(number, "0x")) {
 			// 0x04表示16进制数
 			return Integer.parseInt(number.substring(2), 16);
 		}
@@ -45,6 +122,72 @@ public class NumberUtils {
 		} catch (NumberFormatException e) {
 			return parseNumber(number).intValue();
 		}
+	}
+	
+	/**
+     * 转换为int<br>
+     * 如果给定的值为<code>null</code>，或者转换失败，返回默认值<code>null</code><br>
+     * 转换失败不会报错
+     *
+     * @param value 被转换的值
+     * @return 结果
+     */
+    public static Integer toInt(Object value) {
+        return toInt(value, null);
+    }
+	
+	/**
+	 * 转换为int<br>
+	 * 如果给定的值为空，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 * 
+	 * @param value        被转换的值
+	 * @param defaultValue 转换错误时的默认值
+	 * @return 结果
+	 */
+	public static Integer toInt(Object value, Integer defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+		if (value instanceof Integer) {
+			return (Integer) value;
+		}
+		if (value instanceof Number) {
+			return ((Number) value).intValue();
+		}
+		final String valueStr = StringUtils.toStringOrNull(value);
+		if (StringUtils.isEmpty(valueStr)) {
+			return defaultValue;
+		}
+		try {
+			if (StringUtils.startsWithIgnoreCase(valueStr.trim(), "0x")) {
+				// 0x04表示16进制数
+				return Integer.parseInt(valueStr.trim().substring(2), 16);
+			}
+			return Integer.parseInt(valueStr.trim());
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	/**
+	 * 转换为Integer数组<br>
+	 * 
+	 * @param split 分隔符
+	 * @param str   被转换的值
+	 * @return 结果
+	 */
+	public static Integer[] toIntArray(String split, String str) {
+		if (StringUtils.isEmpty(str)) {
+			return new Integer[] {};
+		}
+		String[] arr = str.split(split);
+		final Integer[] ints = new Integer[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			final Integer v = toInt(arr[i], 0);
+			ints[i] = v;
+		}
+		return ints;
 	}
 	
 	/**
@@ -78,6 +221,73 @@ public class NumberUtils {
 	}
 	
 	/**
+     * 转换为long<br>
+     * 如果给定的值为<code>null</code>，或者转换失败，返回默认值<code>null</code><br>
+     * 转换失败不会报错
+     *
+     * @param value 被转换的值
+     * @return 结果
+     */
+    public static Long toLong(Object value) {
+        return toLong(value, null);
+    }
+    
+	/**
+	 * 转换为long<br>
+	 * 如果给定的值为空，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 * 
+	 * @param value        被转换的值
+	 * @param defaultValue 转换错误时的默认值
+	 * @return 结果
+	 */
+	public static Long toLong(Object value, Long defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+		if (value instanceof Long) {
+			return (Long) value;
+		}
+		if (value instanceof Number) {
+			return ((Number)value).longValue();
+		}
+		final String valueStr = StringUtils.toStringOrNull(value);
+		if (StringUtils.isEmpty(valueStr)) {
+			return defaultValue;
+		}
+		try {
+			if (valueStr.trim().startsWith("0x")) {
+				// 0x04表示16进制数
+				return Long.parseLong(valueStr.trim().substring(2), 16);
+			}
+			// 支持科学计数法
+			return new BigDecimal(valueStr.trim()).longValue();
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	/**
+	 * 转换为Long数组<br>
+	 * 
+	 * @param split 分隔符
+	 * @param str   被转换的值
+	 * @return 结果
+	 */
+	public static Long[] toLongArray(String split, String str) {
+		if (StringUtils.isEmpty(str)) {
+			return new Long[] {};
+		}
+		String[] arr = str.split(split);
+		final Long[] longs = new Long[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			final Long v = toLong(arr[i], null);
+			longs[i] = v;
+		}
+		return longs;
+	}
+	
+	/**
 	 * 解析转换数字字符串为long型数字，规则如下：
 	 *
 	 * <pre>
@@ -100,7 +310,69 @@ public class NumberUtils {
 			return parseNumber(number).floatValue();
 		}
 	}
-
+	
+	/**
+     * 转换为Float<br>
+     * 如果给定的值为空，或者转换失败，返回默认值<code>null</code><br>
+     * 转换失败不会报错
+     *
+     * @param value 被转换的值
+     * @return 结果
+     */
+    public static Float toFloat(Object value) {
+        return toFloat(value, null);
+    }
+    
+	/**
+	 * 转换为Float<br>
+	 * 如果给定的值为空，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 * 
+	 * @param value        被转换的值
+	 * @param defaultValue 转换错误时的默认值
+	 * @return 结果
+	 */
+	public static Float toFloat(Object value, Float defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+		if (value instanceof Float) {
+			return (Float) value;
+		}
+		if (value instanceof Number) {
+			return ((Number) value).floatValue();
+		}
+		final String valueStr = StringUtils.toStringOrNull(value);
+		if (StringUtils.isEmpty(valueStr)) {
+			return defaultValue;
+		}
+		try {
+			return Float.parseFloat(valueStr.trim());
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	/**
+	 * 转换为Float数组<br>
+	 * 
+	 * @param split 分隔符
+	 * @param str   被转换的值
+	 * @return 结果
+	 */
+	public static Float[] toFloatArray(String split, String str) {
+		if (StringUtils.isEmpty(str)) {
+			return new Float[] {};
+		}
+		String[] arr = str.split(split);
+		final Float[] floats = new Float[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			final Float v = toFloat(arr[i], null);
+			floats[i] = v;
+		}
+		return floats;
+	}
+	
 	/**
 	 * 解析转换数字字符串为long型数字，规则如下：
 	 *
@@ -113,7 +385,6 @@ public class NumberUtils {
 	 *
 	 * @param number 数字，支持0x开头、0开头和普通十进制
 	 * @return long
-	 * @since 5.5.5
 	 */
 	public static double parseDouble(String number) {
 		if (StringUtils.isBlank(number)) {
@@ -126,34 +397,218 @@ public class NumberUtils {
 		}
 	}
 	
+    /**
+     * 转换为double<br>
+     * 如果给定的值为空，或者转换失败，返回默认值<code>null</code><br>
+     * 转换失败不会报错
+     *
+     * @param value 被转换的值
+     * @return 结果
+     */
+    public static Double toDouble(Object value) {
+        return toDouble(value, null);
+    }
+	
 	/**
-	 * 将指定字符串转换为{@link Number} 对象<br>
-	 * 此方法不支持科学计数法
-	 *
-	 * @param numberStr Number字符串
-	 * @return Number对象
-	 * @throws NumberFormatException 包装了{@link ParseException}，当给定的数字字符串无法解析时抛出
+	 * 转换为double<br>
+	 * 如果给定的值为空，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 * 
+	 * @param value        被转换的值
+	 * @param defaultValue 转换错误时的默认值
+	 * @return 结果
 	 */
-	public static Number parseNumber(String numberStr) {
-		if(StringUtils.startWithIgnoreCase(numberStr, "0x")){
-			// 0x04表示16进制数
-			return Long.parseLong(numberStr.substring(2), 16);
+	public static Double toDouble(Object value, Double defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+		if (value instanceof Double) {
+			return (Double) value;
+		}
+		if (value instanceof Number) {
+			return ((Number) value).doubleValue();
+		}
+		final String valueStr = StringUtils.toStringOrNull(value);
+		if (StringUtils.isEmpty(valueStr)) {
+			return defaultValue;
 		}
 		try {
-			final NumberFormat format = NumberFormat.getInstance();
-			if (format instanceof DecimalFormat) {
-				// issue#1818@Github
-				// 当字符串数字超出double的长度时，会导致截断，此处使用BigDecimal接收
-				((DecimalFormat) format).setParseBigDecimal(true);
-			}
-			return format.parse(numberStr);
-		} catch (ParseException e) {
-			final NumberFormatException nfe = new NumberFormatException(e.getMessage());
-			nfe.initCause(e);
-			throw nfe;
+			// 支持科学计数法
+			return new BigDecimal(valueStr.trim()).doubleValue();
+		} catch (Exception e) {
+			return defaultValue;
 		}
 	}
 	
+	/**
+	 * 转换为Double数组<br>
+	 * 
+	 * @param split 分隔符
+	 * @param str   被转换的值
+	 * @return 结果
+	 */
+	public static Double[] toDoubleArray(String split, String str) {
+		if (StringUtils.isEmpty(str)) {
+			return new Double[] {};
+		}
+		String[] arr = str.split(split);
+		final Double[] doubles = new Double[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			final Double v = toDouble(arr[i], null);
+			doubles[i] = v;
+		}
+		return doubles;
+	}
+	
+	/**
+	 * 数字转{@link BigDecimal}<br>
+	 * null或""或空白符转换为0
+	 *
+	 * @param numberStr 数字字符串
+	 * @return {@link BigDecimal}
+	 */
+	public static BigDecimal parseBigDecimal(String numberStr) {
+		if (StringUtils.isBlank(numberStr)) {
+			return BigDecimal.ZERO;
+		}
+		try {
+			// 支持类似于 1,234.55 格式的数字
+			final Number number = parseNumber(numberStr);
+			if (number instanceof BigDecimal) {
+				return (BigDecimal) number;
+			} else {
+				return new BigDecimal(number.toString());
+			}
+		} catch (Exception ignore) {
+			// 忽略解析错误
+		}
+		return new BigDecimal(numberStr);
+	}
+	
+    /**
+     * 转换为BigDecimal<br>
+     * 如果给定的值为空，或者转换失败，返回默认值<br>
+     * 转换失败不会报错
+     *
+     * @param value 被转换的值
+     * @return 结果
+     */
+    public static BigDecimal toBigDecimal(Object value) {
+        return toBigDecimal(value, null);
+    }
+    
+	/**
+	 * 转换为BigDecimal<br>
+	 * 如果给定的值为空，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 * 
+	 * @param value        被转换的值
+	 * @param defaultValue 转换错误时的默认值
+	 * @return 结果
+	 */
+	public static BigDecimal toBigDecimal(Object value, BigDecimal defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+		if (value instanceof BigDecimal) {
+			return (BigDecimal) value;
+		}
+		if (value instanceof Long) {
+			return new BigDecimal((Long) value);
+		}
+		if (value instanceof Double) {
+			return BigDecimal.valueOf((Double) value);
+		}
+		if (value instanceof Integer) {
+			return new BigDecimal((Integer) value);
+		}
+		if (value instanceof BigInteger) {
+			return new BigDecimal((BigInteger) value);
+		}
+		final String valueStr = StringUtils.toStringOrNull(value);
+		if (StringUtils.isEmpty(valueStr)) {
+			return defaultValue;
+		}
+		try {
+			return new BigDecimal(valueStr);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	/**
+	 * 转换为BigDecimal数组<br>
+	 * 
+	 * @param split 分隔符
+	 * @param str   被转换的值
+	 * @return 结果
+	 */
+	public static BigDecimal[] toBigDecimalArray(String split, String str) {
+		if (StringUtils.isEmpty(str)) {
+			return new BigDecimal[] {};
+		}
+		String[] arr = str.split(split);
+		final BigDecimal[] bigDecimals = new BigDecimal[arr.length];
+		for (int i = 0; i < arr.length; i++) {
+			final BigDecimal v = toBigDecimal(arr[i], null);
+			bigDecimals[i] = v;
+		}
+		return bigDecimals;
+	}
+	
+	/**
+	 * 数字转{@link BigInteger}<br>
+	 * null或""或空白符转换为0
+	 *
+	 * @param number 数字字符串
+	 * @return {@link BigInteger}
+	 */
+	public static BigInteger parseBigInteger(String number) {
+		return StringUtils.isBlank(number) ? BigInteger.ZERO : new BigInteger(number);
+	}
+	
+	/**
+	 * 转换为BigInteger<br>
+	 * 如果给定的值为空，或者转换失败，返回默认值<code>null</code><br>
+	 * 转换失败不会报错
+	 *
+	 * @param value 被转换的值
+	 * @return 结果
+	 */
+	public static BigInteger toBigInteger(Object value) {
+		return toBigInteger(value, null);
+	}
+    
+	/**
+	 * 转换为BigInteger<br>
+	 * 如果给定的值为空，或者转换失败，返回默认值<br>
+	 * 转换失败不会报错
+	 *
+	 * @param value        被转换的值
+	 * @param defaultValue 转换错误时的默认值
+	 * @return 结果
+	 */
+	public static BigInteger toBigInteger(Object value, BigInteger defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+		if (value instanceof BigInteger) {
+			return (BigInteger) value;
+		}
+		if (value instanceof Long) {
+			return BigInteger.valueOf((Long) value);
+		}
+		final String valueStr = StringUtils.toStringOrNull(value);
+		if (StringUtils.isEmpty(valueStr)) {
+			return defaultValue;
+		}
+		try {
+			return new BigInteger(valueStr);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
 	/**
 	 * 是否为数字，支持包括：
 	 *
@@ -349,7 +804,7 @@ public class NumberUtils {
 	 * @param number 数字
 	 * @return {@link BigDecimal}
 	 */
-	public static BigDecimal toBigDecimal(Number number) {
+	public static BigDecimal numberToBigDecimal(Number number) {
 		if (null == number) {
 			return BigDecimal.ZERO;
 		}
@@ -363,32 +818,7 @@ public class NumberUtils {
 			return new BigDecimal((BigInteger) number);
 		}
 		// Float、Double等有精度问题，转换为字符串后再转换
-		return toBigDecimal(number.toString());
-	}
-	
-	/**
-	 * 数字转{@link BigDecimal}<br>
-	 * null或""或空白符转换为0
-	 *
-	 * @param numberStr 数字字符串
-	 * @return {@link BigDecimal}
-	 */
-	public static BigDecimal toBigDecimal(String numberStr) {
-		if (StringUtils.isBlank(numberStr)) {
-			return BigDecimal.ZERO;
-		}
-		try {
-			// 支持类似于 1,234.55 格式的数字
-			final Number number = parseNumber(numberStr);
-			if (number instanceof BigDecimal) {
-				return (BigDecimal) number;
-			} else {
-				return new BigDecimal(number.toString());
-			}
-		} catch (Exception ignore) {
-			// 忽略解析错误
-		}
-		return new BigDecimal(numberStr);
+		return parseBigDecimal(number.toString());
 	}
 	
 	/**
@@ -398,7 +828,7 @@ public class NumberUtils {
 	 * @param number 数字
 	 * @return {@link BigInteger}
 	 */
-	public static BigInteger toBigInteger(Number number) {
+	public static BigInteger numberToBigInteger(Number number) {
 		if (null == number) {
 			return BigInteger.ZERO;
 		}
@@ -407,18 +837,7 @@ public class NumberUtils {
 		} else if (number instanceof Long) {
 			return BigInteger.valueOf((Long) number);
 		}
-		return toBigInteger(number.longValue());
-	}
-
-	/**
-	 * 数字转{@link BigInteger}<br>
-	 * null或""或空白符转换为0
-	 *
-	 * @param number 数字字符串
-	 * @return {@link BigInteger}
-	 */
-	public static BigInteger toBigInteger(String number) {
-		return StringUtils.isBlank(number) ? BigInteger.ZERO : new BigInteger(number);
+		return numberToBigInteger(number.longValue());
 	}
 	
 	/**
@@ -433,7 +852,7 @@ public class NumberUtils {
 			return BigDecimal.ZERO;
 		}
 		BigDecimal value = values[0];
-		BigDecimal result = toBigDecimal(value);
+		BigDecimal result = numberToBigDecimal(value);
 		for (int i = 1; i < values.length; i++) {
 			value = values[i];
 			if (null != value) {
@@ -466,11 +885,11 @@ public class NumberUtils {
 			return BigDecimal.ZERO;
 		}
 		Number value = values[0];
-		BigDecimal result = toBigDecimal(value);
+		BigDecimal result = numberToBigDecimal(value);
 		for (int i = 1; i < values.length; i++) {
 			value = values[i];
 			if (null != value) {
-				result = result.subtract(toBigDecimal(value));
+				result = result.subtract(numberToBigDecimal(value));
 			}
 		}
 		return result;
@@ -541,7 +960,7 @@ public class NumberUtils {
 	 * @return 两个参数的商
 	 */
 	public static BigDecimal divide(String v1, String v2, int scale, RoundingMode roundingMode) {
-		return divide(toBigDecimal(v1), toBigDecimal(v2), scale, roundingMode);
+		return divide(parseBigDecimal(v1), parseBigDecimal(v2), scale, roundingMode);
 	}
 	
 	/**
@@ -623,7 +1042,7 @@ public class NumberUtils {
 		if (scale < 0) {
 			scale = 0;
 		}
-		return round(toBigDecimal(numberStr), scale, roundingMode);
+		return round(parseBigDecimal(numberStr), scale, roundingMode);
 	}
 	
 	/**

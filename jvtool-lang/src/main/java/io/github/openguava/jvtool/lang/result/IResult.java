@@ -27,6 +27,9 @@ public interface IResult<T> {
 	/** 500 操作失败 */
 	public static int STATUS_CODE_ERROR = HttpConstants.HTTP_STATUSCODE_INTERNAL_SERVER_ERROR;
 	
+	/** 601 警告 */
+	public static int STATUS_CODE_WARN = 601;
+	
 	public static String MSG_OK = "操作成功";
 	
 	public static String MSG_ERROR = "操作失败";
@@ -146,6 +149,43 @@ public interface IResult<T> {
 	 * @param msg 消息
 	 */
 	public default IResult<T> fail(int code, String msg) {
+		this.setResult(null, code, msg);
+		return this;
+	}
+	
+	/**
+	 * 警告
+	 */
+	public default IResult<T> warn() {
+		this.setResult(null, STATUS_CODE_WARN, null);
+		return this;
+	}
+	
+	/**
+	 * 警告
+	 * @param msg 消息
+	 */
+	public default IResult<T> warn(String msg) {
+		setResult(null, STATUS_CODE_WARN, msg);
+		return this;
+	}
+	
+	/**
+	 * 警告
+	 * @param data 数据
+	 * @param msg 消息
+	 */
+	public default IResult<T> warn(T data, String msg) {
+		this.setResult(data, STATUS_CODE_WARN, msg);
+		return this;
+	}
+	
+	/**
+	 * 警告
+	 * @param data 数据
+	 * @param msg 消息
+	 */
+	public default IResult<T> warn(int code, String msg) {
 		this.setResult(null, code, msg);
 		return this;
 	}

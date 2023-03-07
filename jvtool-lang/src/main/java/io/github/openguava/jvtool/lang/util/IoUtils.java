@@ -14,7 +14,9 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -390,6 +392,122 @@ public class IoUtils {
     }
     
     /**
+     * Writes bytes from a {@code byte[]} to an {@code OutputStream}.
+     *
+     * @param data the byte array to write, do not modify during output,
+     * null ignored
+     * @param output the {@code OutputStream} to write to
+     * @throws NullPointerException if output is null
+     * @throws IOException          if an I/O error occurs
+     * @since 1.1
+     */
+    public static long write(final byte[] data, final OutputStream output)
+            throws IOException {
+    	if(data == null) {
+    		return 0L;
+    	}
+    	output.write(data);
+    	return data.length;
+    }
+    
+    /**
+     * Writes chars from a {@code String} to bytes on an
+     * {@code OutputStream} using the specified character encoding.
+     * <p>
+     * Character encoding names can be found at
+     * <a href="http://www.iana.org/assignments/character-sets">IANA</a>.
+     * <p>
+     * This method uses {@link String#getBytes(String)}.
+     *
+     * @param data the {@code String} to write, null ignored
+     * @param output the {@code OutputStream} to write to
+     * @param charsetName the name of the requested charset, null means platform default
+     * @throws NullPointerException        if output is null
+     * @throws IOException                 if an I/O error occurs
+     * @throws java.nio.charset.UnsupportedCharsetException thrown instead of {@link java.io
+     * .UnsupportedEncodingException} in version 2.2 if the encoding is not supported.
+     * @since 1.1
+     */
+    public static long write(final String data, final OutputStream output, final String charsetName)
+            throws IOException {
+        return write(data, output, CharsetUtils.charset(charsetName));
+    }
+    
+    /**
+     * Writes chars from a {@code String} to bytes on an
+     * {@code OutputStream} using the specified character encoding.
+     * <p>
+     * This method uses {@link String#getBytes(String)}.
+     *
+     * @param data the {@code String} to write, null ignored
+     * @param output the {@code OutputStream} to write to
+     * @param charset the charset to use, null means platform default
+     * @throws NullPointerException if output is null
+     * @throws IOException          if an I/O error occurs
+     * @since 2.3
+     */
+    public static long write(final String data, final OutputStream output, final Charset charset) throws IOException {
+        if(data == null) {
+        	return 0L;
+        }
+        byte[] bytes = data.getBytes(CharsetUtils.charset(charset));
+        output.write(bytes);
+        return bytes.length;
+    }
+    
+    /**
+     * Writes the {@code toString()} value of each item in a collection to
+     * an {@code OutputStream} line by line, using the specified character
+     * encoding and the specified line ending.
+     *
+     * @param lines the lines to write, null entries produce blank lines
+     * @param output the {@code OutputStream} to write to, not null, not closed
+     * @param charset the charset to use, null means platform default
+     * @throws NullPointerException if the output is null
+     * @throws IOException          if an I/O error occurs
+     * @since 2.3
+     */
+    public static long writeLines(final Collection<?> lines, final OutputStream output,
+                                  final Charset charset) throws IOException {
+    	return writeLines(lines, null, output, charset);
+    }
+    
+    /**
+     * Writes the {@code toString()} value of each item in a collection to
+     * an {@code OutputStream} line by line, using the specified character
+     * encoding and the specified line ending.
+     *
+     * @param lines the lines to write, null entries produce blank lines
+     * @param lineEnding the line separator to use, null is system default
+     * @param output the {@code OutputStream} to write to, not null, not closed
+     * @param charset the charset to use, null means platform default
+     * @throws NullPointerException if the output is null
+     * @throws IOException          if an I/O error occurs
+     * @since 2.3
+     */
+    public static long writeLines(final Collection<?> lines, String lineEnding, final OutputStream output,
+                                  final Charset charset) throws IOException {
+        if (lines == null) {
+            return 0L;
+        }
+        if (lineEnding == null) {
+            lineEnding = System.lineSeparator();
+        }
+        long writeBytes = 0L;
+        final Charset cs = CharsetUtils.charset(charset);
+        for (final Object line : lines) {
+        	byte[] buffer = null;
+            if (line != null) {
+                output.write((buffer = line.toString().getBytes(cs)));
+                writeBytes += buffer.length;
+            }
+            output.write((buffer = lineEnding.getBytes(cs)));
+            writeBytes += buffer.length;
+        }
+        return writeBytes;
+    }
+    
+    /**
      * Get the contents of an <code>InputStream</code> as a list of Strings,
      * one entry per line, using the specified character encoding.
      * <p>
@@ -415,7 +533,6 @@ public class IoUtils {
     	}
     	return readLines(reader);
     }
-
     
     /**
      * Get the contents of a <code>Reader</code> as a list of Strings,

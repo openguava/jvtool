@@ -44,6 +44,42 @@ public class SystemUtils {
 	}
 	
 	/**
+	 * 获取系统属性值
+	 * @param key 键
+	 * @param def 默认值
+	 * @return
+	 */
+	public static String getProperty(String key, String def) {
+		return getProperty(key, def, true);
+	}
+	
+	/**
+	 * 获取系统属性值
+	 * @param key 键
+	 * @param def 默认值
+	 * @param init 是否自动初始化
+	 * @return
+	 */
+	public static String getProperty(String key, String def, boolean init) {
+		if (!init) {
+			return System.getProperty(key, def);
+		}
+		String val = System.getProperty(key);
+		if (val == null) {
+			System.setProperty(key, (val = def));
+		}
+		return val;
+	}
+	
+	/**
+	 * 获取系统属性集合
+	 * @return
+	 */
+	public static Properties getProperties() {
+		return System.getProperties();
+	}
+	
+	/**
 	 * 设置系统属性值
 	 * @param key 键
 	 * @param value 值
@@ -54,16 +90,21 @@ public class SystemUtils {
 	}
 	
 	/**
-	 * 设置系统属性
+	 * 设置系统属性集合
 	 * @param properties 配置
+	 * @param append 是否追加模式
 	 */
-	public static void setProperty(Properties properties) {
+	public static void setProperty(Properties properties, boolean append) {
 		if(properties == null) {
 			return;
 		}
-		for(Object key : properties.keySet()) {
-			Object value = properties.get(key);
-			System.setProperty(key.toString(), value != null ? value.toString() : StringConstants.STRING_EMPTY);
+		if(append) {
+			for(Object key : properties.keySet()) {
+				Object value = properties.get(key);
+				System.setProperty(key.toString(), value != null ? value.toString() : StringConstants.STRING_EMPTY);
+			}
+		} else {
+			System.setProperties(properties);
 		}
 	}
 	

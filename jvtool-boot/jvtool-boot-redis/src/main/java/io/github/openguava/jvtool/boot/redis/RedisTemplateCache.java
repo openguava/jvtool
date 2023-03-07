@@ -1,5 +1,8 @@
 package io.github.openguava.jvtool.boot.redis;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -10,26 +13,28 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import io.github.openguava.jvtool.lang.cache.AbstractCache;
+import io.github.openguava.jvtool.lang.util.ObjectUtils;
+import io.github.openguava.jvtool.lang.util.StringUtils;
 
 public class RedisTemplateCache extends AbstractCache {
 
 	private static final long serialVersionUID = 1L;
 	
 	/** redisTemplate */
-	private RedisTemplate<Object, Object> redisTemplate;	
+	private RedisTemplate<String, Object> redisTemplate;	
 	
-	public RedisTemplateCache(String name, RedisTemplate<Object, Object> redisTemplate) {
+	public RedisTemplateCache(String name, RedisTemplate<String, Object> redisTemplate) {
 		super(name);
 		this.redisTemplate = redisTemplate;
 	}
 
 	@Override
-	public Object get(Object key) {
+	public Object get(String key) {
 		return this.redisTemplate.opsForValue().get(key);
 	}
 
 	@Override
-	public Object get(Object key, Supplier<Object> valueLoader) {
+	public Object get(String key, Supplier<Object> valueLoader) {
 		Object val = this.redisTemplate.opsForValue().get(key);
 		if(val == null && valueLoader != null) {
 			val = valueLoader.get();
@@ -37,14 +42,38 @@ public class RedisTemplateCache extends AbstractCache {
 		}
 		return val;
 	}
+	
+	@Override
+	public byte[] getBytes(String key) {
+		final byte[] keyBytes = StringUtils.toBytes(key);
+		return this.redisTemplate.execute(new RedisCallback<byte[]>() {
+			@Override
+			public byte[] doInRedis(RedisConnection connection) throws DataAccessException {
+				return connection.get(keyBytes);
+			}
+		});
+	}
+	
+	@Override
+	public <T> T getItem(String key, Class<T> clazz) {
+		byte[] data = this.getBytes(key);
+		return new RedisTemplateJsonSerializer<T>(clazz).deserialize(data);
+	}
+	
+	@Override
+	public <T> List<T> getList(String key, Class<T> clazz) {
+		byte[] data = this.getBytes(key);
+		List<T> array = new ArrayList<T>();
+		return new RedisTemplateJsonSerializer<List<T>>(null).deserialize(data);
+	}
 
 	@Override
-	public void put(Object key, Object value) {
+	public void put(String key, Object value) {
 		this.redisTemplate.opsForValue().set(key, value);
 	}
 
 	@Override
-	public void put(Object key, Object value, long ttl) {
+	public void put(String key, Object value, long ttl) {
 		if(ttl > 0L) {
 			this.redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.MILLISECONDS);
 		} else {
@@ -53,18 +82,27 @@ public class RedisTemplateCache extends AbstractCache {
 	}
 
 	@Override
-	public boolean remove(Object key) {
-		Boolean ret = this.redisTemplate.delete(key);
-		return (ret != null && ret.booleanValue()) ? true : false;
+	public boolean remove(String key) {
+		return ObjectUtils.ifNull(this.redisTemplate.delete(key), false);
+	}
+	
+	@Override
+	public long removes(Collection<String> keys) {
+		return ObjectUtils.ifNull(this.redisTemplate.delete(keys), 0L);
+	}
+	
+	@Override
+	public boolean exists(String key) {
+		return ObjectUtils.ifNull(this.redisTemplate.hasKey(key), false);
 	}
 
 	@Override
-	public Set<Object> keys(Object pattern) {
+	public Set<String> keys(String pattern) {
 		return this.redisTemplate.keys(pattern);
 	}
 
 	@Override
-	public long size(Object pattern) {
+	public long size(String pattern) {
 		return this.redisTemplate.execute(new RedisCallback<Long>() {
 			@Override
 			public Long doInRedis(RedisConnection connection) throws DataAccessException {
@@ -83,5 +121,4 @@ public class RedisTemplateCache extends AbstractCache {
 			}
 		});
 	}
-
 }

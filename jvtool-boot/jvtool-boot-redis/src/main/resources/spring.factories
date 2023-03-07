@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.github.openguava.jvtool.boot.redis.config.RedisConfig,\
+io.github.openguava.jvtool.boot.redis.service.RedisTemplateCacheManager

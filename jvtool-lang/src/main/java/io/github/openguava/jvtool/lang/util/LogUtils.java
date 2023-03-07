@@ -199,4 +199,11 @@ public class LogUtils {
 			log.warn(format, arguments);
 		}
 	}
+	
+	public static String getBlock(Object msg) {
+		if (msg == null) {
+			msg = "";
+		}
+		return "[" + msg.toString() + "]";
+	}
 }

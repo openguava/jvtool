@@ -87,6 +87,14 @@ public class AuthUtils {
 	}
 	
 	/**
+	 * 获取登录令牌(校验失败则引发异常)
+	 * @return
+	 */
+	public static AuthToken getLoginToken() {
+		return getAuthLogic().getLoginToken(true);
+	}
+	
+	/**
 	 * 获取登录令牌
 	 * @param check 是否校验(校验失败则引发异常)
 	 * @return
@@ -96,12 +104,40 @@ public class AuthUtils {
 	}
 	
 	/**
+	 * 获取登录用户(校验失败则引发异常)
+	 * @return
+	 */
+	public static AuthUser getLoginUser() {
+		return getLoginUser(true);
+	}
+	
+	/**
 	 * 获取登录用户
 	 * @param check 是否校验(校验失败则引发异常)
 	 * @return
 	 */
 	public static AuthUser getLoginUser(boolean check) {
 		return getAuthLogic().getLoginUser(check);
+	}
+	
+	/**
+	 * 获取登录用户id
+	 * @param check
+	 * @return
+	 */
+	public static String getLoginUserId(boolean check) {
+		AuthUser authUser = getLoginUser(check);
+		return authUser != null ? authUser.getUserId() : null;
+	}
+	
+	/**
+	 * 获取登录用户名
+	 * @param check
+	 * @return
+	 */
+	public static String getLoginUsername(boolean check) {
+		AuthUser authUser = getLoginUser(check);
+		return authUser != null ? authUser.getUsername() : null;
 	}
 	
 	/**
@@ -200,5 +236,24 @@ public class AuthUtils {
 	 */
 	public static void checkApi(RequiresApi requiresApi) {
 		getAuthLogic().checkApi(requiresApi);
+	}
+	
+	/**
+	 * 密码加密
+	 * @param password 要加密的密码
+	 * @return
+	 */
+	public static String encryptPassword(String password) {
+		return getAuthLogic().encryptPassword(password);
+	}
+	
+	/**
+	 * 密码校验
+	 * @param rawPassword 明文密码
+	 * @param encryptedPassword 加密后的密码
+	 * @return
+	 */
+	public static boolean matchesPassword(String rawPassword, String encryptedPassword) {
+		return getAuthLogic().matchesPassword(rawPassword, encryptedPassword);
 	}
 }

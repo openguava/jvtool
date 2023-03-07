@@ -91,6 +91,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 	 */
 	public boolean isJsonRequest() {
 		String header = super.getHeader(HttpConstants.HTTP_HEADER_CONTENT_TYPE);
-		return StringUtils.startWithIgnoreCase(header, HttpConstants.HTTP_CONTENTTYPE_APPLICATION_JSON);
+		return StringUtils.startsWithIgnoreCase(header, HttpConstants.HTTP_CONTENTTYPE_APPLICATION_JSON);
 	}
 }

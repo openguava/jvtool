@@ -29,6 +29,12 @@ public interface AuthUser extends Serializable {
 	String getUsername();
 	
 	/**
+	 * 获取密码
+	 * @return
+	 */
+	String getPassword();
+	
+	/**
 	 * 获取真实姓名
 	 * @return
 	 */
@@ -39,6 +45,42 @@ public interface AuthUser extends Serializable {
 	 * @return
 	 */
 	String getNickname();
+	
+	/**
+	 * 获取机构id
+	 * @return
+	 */
+	String getOrgId();
+	
+	/**
+	 * 获取机构编号
+	 * @return
+	 */
+	String getOrgCode();
+	
+	/**
+	 * 获取机构名称
+	 * @return
+	 */
+	String getOrgName();
+	
+	/**
+	 * 获取部门id
+	 * @return
+	 */
+	String getDeptId();
+	
+	/**
+	 * 获取部门编号
+	 * @return
+	 */
+	String getDeptCode();
+	
+	/**
+	 * 获取部门名称
+	 * @return
+	 */
+	String getDeptName();
 	
 	/**
 	 * 获取角色
@@ -63,4 +105,22 @@ public interface AuthUser extends Serializable {
 	 * @return
 	 */
 	Serializable getExtra();
+	
+	/**
+	 * 是否启用
+	 * @return
+	 */
+	boolean isEnabled();
+	
+	/**
+	 * 是否锁定
+	 * @return
+	 */
+	boolean isLocked();
+	
+	/**
+	 * 是否过期
+	 * @return
+	 */
+	boolean isExpired();
 }

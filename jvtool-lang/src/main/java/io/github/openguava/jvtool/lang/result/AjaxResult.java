@@ -113,6 +113,26 @@ public class AjaxResult extends HashMap<String, Object> implements IResult<Objec
 		return newResult(null, code, msg);
 	}
 	
+	public static AjaxResult setWarn() {
+		return newResult(null, IResult.STATUS_CODE_WARN, IResult.MSG_ERROR);
+	}
+
+	public static AjaxResult setWarn(String msg) {
+		return newResult(null, IResult.STATUS_CODE_WARN, msg);
+	}
+
+	public static <T> AjaxResult setWarn(T data) {
+		return newResult(data, IResult.STATUS_CODE_WARN, IResult.MSG_ERROR);
+	}
+
+	public static <T> AjaxResult setWarn(T data, String msg) {
+		return newResult(data, IResult.STATUS_CODE_WARN, msg);
+	}
+
+	public static AjaxResult setWarn(int code, String msg) {
+		return newResult(null, code, msg);
+	}
+	
 	private static <T> AjaxResult newResult(T data, int code, String msg) {
 		AjaxResult result = new AjaxResult();
 		result.setResult(data, code, msg);

@@ -346,6 +346,15 @@ public class UrlUtils {
 		return url;
 	}
 	
+	/**
+	 * 是否 http/https
+	 * @param url
+	 * @return
+	 */
+	public static boolean isHttp(String url) {
+		return StringUtils.startsWithAny(url, UrlConstants.URL_PREFIX_HTTP, UrlConstants.URL_PREFIX_HTTPS);
+	}
+	
 	public static void main(String[] args) {
 		
 	}

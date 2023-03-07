@@ -4,12 +4,50 @@
 	<parent>
 		<groupId>io.github.openguava</groupId>
 		<artifactId>jvtool</artifactId>
-		<version>0.0.2</version>
+		<version>0.0.3</version>
 	</parent>
 	<artifactId>jvtool-boot</artifactId>
 	<packaging>pom</packaging>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.github.openguava</groupId>
+				<artifactId>jvtool-boot-core</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openguava</groupId>
+				<artifactId>jvtool-boot-redis</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openguava</groupId>
+				<artifactId>jvtool-boot-mybatis</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openguava</groupId>
+				<artifactId>jvtool-boot-datasource</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openguava</groupId>
+				<artifactId>jvtool-boot-security</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openguava</groupId>
+				<artifactId>jvtool-boot-swagger</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>	
 	<modules>
+		<module>jvtool-boot-core</module>
 		<module>jvtool-boot-redis</module>
-    <module>jvtool-boot-mybatis</module>
-  </modules>
+    	<module>jvtool-boot-mybatis</module>
+    	<module>jvtool-boot-datasource</module>
+    	<module>jvtool-boot-security</module>
+    	<module>jvtool-boot-swagger</module>
+  	</modules>
 </project>

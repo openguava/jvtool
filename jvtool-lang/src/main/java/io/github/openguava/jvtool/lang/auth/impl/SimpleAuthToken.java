@@ -1,6 +1,10 @@
 package io.github.openguava.jvtool.lang.auth.impl;
 
+import java.util.Date;
+
 import io.github.openguava.jvtool.lang.auth.AuthToken;
+import io.github.openguava.jvtool.lang.util.DateUtils;
+import io.github.openguava.jvtool.lang.util.ObjectUtils;
 
 public class SimpleAuthToken implements AuthToken {
 
@@ -37,5 +41,22 @@ public class SimpleAuthToken implements AuthToken {
 
 	public void setTokenExpire(Long tokenExpire) {
 		this.tokenExpire = tokenExpire;
+	}
+	
+	public SimpleAuthToken() {
+		
+	}
+	
+	public SimpleAuthToken(String tokenValue) {
+		this.tokenValue = tokenValue;
+	}
+	
+	/**
+	 * 判断 token 是否过期
+	 * @param now
+	 * @return
+	 */
+	public boolean isExpired(Date now) {
+		return this.tokenExpire != null && this.tokenExpire >= ObjectUtils.ifNull(now, DateUtils.getDate()).getTime();
 	}
 }

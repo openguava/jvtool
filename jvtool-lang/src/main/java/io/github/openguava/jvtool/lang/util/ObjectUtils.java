@@ -1,6 +1,8 @@
 package io.github.openguava.jvtool.lang.util;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -61,6 +63,102 @@ public class ObjectUtils {
 	}
 	
 	/**
+	 * 字符串是否为空
+	 * @param str
+	 * @return
+	 */
+	public static boolean isEmpty(CharSequence str) {
+		return StringUtils.isEmpty(str);
+	}
+	
+	/**
+	 * 判断数组是否为空
+	 * @param <T>
+	 * @param array
+	 * @return
+	 */
+	@SafeVarargs
+	public static <T> boolean isEmpty(T... array) {
+		return ArrayUtils.isEmpty(array);
+	}
+	
+	/**
+	 * 判断集合是否为空
+	 * @param <T>
+	 * @param c
+	 * @return
+	 */
+	public static boolean isEmpty(Collection<?> c) {
+		return CollectionUtils.isEmpty(c);
+	}
+	
+	/**
+	 * 判断 Iterator 是否为空
+	 * @param iterator
+	 * @return
+	 */
+	public static boolean isEmpty(Iterator<?> iterator) {
+		return CollectionUtils.isEmpty(iterator);
+	}
+	
+    /**
+	 * 判断 iterable 是否为空
+	 * @param iterable
+	 * @return
+	 */
+	public static boolean isEmpty(Iterable<?> iterable) {
+		return CollectionUtils.isEmpty(iterable);
+	}
+	
+	/**
+	 * 字符串是否为非空
+	 * @param str
+	 * @return
+	 */
+	public static boolean isNotEmpty(CharSequence str) {
+		return StringUtils.isNotEmpty(str);
+	}
+	
+	/**
+	 * 判断数组是否为非空
+	 * @param <T>
+	 * @param array
+	 * @return
+	 */
+	@SafeVarargs
+	public static <T> boolean isNotEmpty(T... array) {
+		return ArrayUtils.isNotEmpty(array);
+	}
+	
+	/**
+	 * 判断集合是否为非空
+	 * @param <T>
+	 * @param c
+	 * @return
+	 */
+	public static boolean isNotEmpty(Collection<?> c) {
+		return CollectionUtils.isNotEmpty(c);
+	}
+	
+	/**
+	 * 判断 Iterator 是否为非空
+	 * @param iterator
+	 * @return
+	 */
+	public static boolean isNotEmpty(Iterator<?> iterator) {
+		return CollectionUtils.isNotEmpty(iterator);
+	}
+	
+    /**
+	 * 判断 iterable 是否为非空
+	 * @param iterable
+	 * @return
+	 */
+	public static boolean isNotEmpty(Iterable<?> iterable) {
+		return CollectionUtils.isNotEmpty(iterable);
+	}
+	
+	/**
 	 * ifnull 表达式
 	 * @param <T>
 	 * @param obj 对象
@@ -98,6 +196,41 @@ public class ObjectUtils {
 	public static <T, P> P ifNull(T obj, Function<T, P> prop, P def) {
 		P val = get(obj, prop);
 		return val != null ? val : def;
+	}
+	
+	/**
+	 * nvl 表达式(同ifNull)
+	 * @param <T>
+	 * @param obj 对象
+	 * @param def 默认值
+	 * @return
+	 */
+	public static <T> T nvl(T obj, T def) {
+		return ifNull(obj, def);
+	}
+	
+	/**
+	 * nvl 表达式(同ifNull)
+	 * @param <T>
+	 * @param obj 对象
+	 * @param defSupplier 默认值提供者
+	 * @return
+	 */
+	public static <T> T nvl(T obj, Supplier<T> defSupplier) {
+		return ifNull(obj, defSupplier);
+	}
+	
+	/**
+	 * nvl 表达式(同ifNull)
+	 * @param <T>
+	 * @param <P>
+	 * @param obj 对象
+	 * @param prop 属性表达式
+	 * @param def 属性默认值
+	 * @return
+	 */
+	public static <T, P> P nvl(T obj, Function<T, P> prop, P def) {
+		return ifNull(obj, prop, def);
 	}
 	
 	/**

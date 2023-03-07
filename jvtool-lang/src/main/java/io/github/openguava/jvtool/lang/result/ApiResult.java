@@ -40,6 +40,26 @@ public class ApiResult<T> extends Result<T> {
 	public static <T> ApiResult<T> setFail(int code, String msg) {
 		return newResult(null, code, msg);
 	}
+	
+	public static <T> ApiResult<T> setWarn() {
+		return newResult(null, IResult.STATUS_CODE_WARN, IResult.MSG_ERROR);
+	}
+
+	public static <T> ApiResult<T> setWarn(String msg) {
+		return newResult(null, IResult.STATUS_CODE_WARN, msg);
+	}
+
+	public static <T> ApiResult<T> setWarn(T data) {
+		return newResult(data, IResult.STATUS_CODE_WARN, IResult.MSG_ERROR);
+	}
+
+	public static <T> ApiResult<T> setWarn(T data, String msg) {
+		return newResult(data, IResult.STATUS_CODE_WARN, msg);
+	}
+
+	public static <T> ApiResult<T> setWarn(int code, String msg) {
+		return newResult(null, code, msg);
+	}
 
 	private static <T> ApiResult<T> newResult(T data, int code, String msg) {
 		ApiResult<T> result = new ApiResult<>();

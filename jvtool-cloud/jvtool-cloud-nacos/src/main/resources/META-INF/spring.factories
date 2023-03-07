@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.github.openguava.jvtool.cloud.nacos.config.NacosRegistyConfig

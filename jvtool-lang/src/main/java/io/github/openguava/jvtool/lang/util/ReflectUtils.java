@@ -28,6 +28,10 @@ public class ReflectUtils {
 	 * The package separator character: {@code '&#x2e;' == {@value}}.
 	 */
 	public static final char PACKAGE_SEPARATOR_CHAR = '.';
+	
+	private static final String SETTER_PREFIX = "set";
+
+	private static final String GETTER_PREFIX = "get";
 
 	/**
 	 * 构造对象缓存
@@ -260,6 +264,38 @@ public class ReflectUtils {
 
 	/**
 	 * 调用方法
+	 * @param instance 实例
+	 * @param methodName 方法名
+	 * @param paramTypes 参数类型
+	 * @param paramArgs 参数值
+	 * @return
+	 * @throws InvocationTargetException
+	 */
+	public static Object invokeMethod(Object instance, String methodName, Class<?>[] paramTypes, Object[] paramArgs) throws InvocationTargetException {
+		if(instance == null) {
+			return null;
+		}
+		// 补充 paramTypes
+		if(ArrayUtils.isNotEmpty(paramArgs) && ArrayUtils.isEmpty(paramTypes)) {
+			paramTypes = new Class<?>[paramArgs.length];
+			for(int i = 0; i < paramArgs.length; i++) {
+				paramTypes[i] = paramArgs[i] != null ? paramArgs[i].getClass() : null;
+			}
+		}
+		Class<?> clazz = instance.getClass();
+		Method method = getMethod(clazz, methodName, paramTypes);
+		if(method == null) {
+			return null;
+		}
+		try {
+			return method.invoke(instance, paramArgs);
+		} catch (Exception e) {
+			throw new InvocationTargetException(e);
+		}
+	}
+	
+	/**
+	 * 调用方法
 	 * @param clazz
 	 * @param methodName
 	 * @param paramTypes
@@ -274,6 +310,28 @@ public class ReflectUtils {
 			return null;
 		}
 		try {
+			return method.invoke(instance, paramArgs);
+		} catch (Exception e) {
+			throw new InvocationTargetException(e);
+		}
+	}
+	
+	/**
+	 * 调用方法
+	 * @param method
+	 * @param instance
+	 * @param paramArgs
+	 * @return
+	 * @throws InvocationTargetException
+	 */
+	public static Object invokeMethod(Method method, Object instance, Object[] paramArgs) throws InvocationTargetException {
+		if(method == null) {
+			return null;
+		}
+		try {
+			if(!method.isAccessible()) {
+				method.setAccessible(true);
+			}
 			return method.invoke(instance, paramArgs);
 		} catch (Exception e) {
 			throw new InvocationTargetException(e);
@@ -415,6 +473,67 @@ public class ReflectUtils {
 		}
 
 		return allMethods;
+	}
+	
+	/**
+	 * 调用 get 方法. 支持多级，如：对象名.对象名.方法
+	 * @param obj
+	 * @param propertyName
+	 * @return
+	 * @throws InvocationTargetException 
+	 */
+	public static Object invokeGetterMethod(Object obj, String propertyName) throws InvocationTargetException {
+		Object object = obj;
+		String[] names = StringUtils.split(propertyName, ".");
+		for(String name : names) {
+			String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(name);
+			object = invokeMethod(object, getterMethodName, new Class[] {}, new Object[] {});
+		}
+		return object;
+	}
+	
+	/**
+	 * 获取 get 函数
+	 * @param clazz
+	 * @param propertyName
+	 * @return
+	 */
+	public static Method getGetterMethod(Class<?> clazz, String propertyName) {
+		String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(propertyName);
+		return getMethod(clazz, getterMethodName, new Class<?>[] {});
+	}
+	
+	/**
+	 * 调用 set 方法, 仅匹配方法名。 支持多级，如：对象名.对象名.方法
+	 * @param obj
+	 * @param propertyName
+	 * @param value
+	 * @throws InvocationTargetException
+	 */
+	public static void invokeSetterMethod(Object obj, String propertyName, Object value) throws InvocationTargetException {
+		Object object = obj;
+		String[] names = StringUtils.split(propertyName, ".");
+		for (int i = 0; i < names.length; i++) {
+			if (i < names.length - 1) {
+				String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(names[i]);
+				object = invokeMethod(object, getterMethodName, new Class[] {}, new Object[] {});
+			} else {
+				String setterMethodName = SETTER_PREFIX + StringUtils.capitalize(names[i]);
+				invokeMethod(object, setterMethodName, null, new Object[] { value });
+			}
+		}
+	}
+	
+	/**
+	 * 获取 set 函数
+	 * @param clazz
+	 * @param propertyName
+	 * @param propertyType
+	 * @return
+	 */
+	public static Method getSetterMethod(Class<?> clazz, String propertyName, Class<?> propertyType) {
+		String setterMethodName = SETTER_PREFIX + StringUtils.capitalize(propertyName);
+		return getMethod(clazz, setterMethodName, new Class<?>[] { propertyType });
 	}
 
 	// ----------------------------------- End Method

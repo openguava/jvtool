@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import io.github.openguava.jvtool.lang.constant.PatternConstants;
 import io.github.openguava.jvtool.lang.constant.SqlConstants;
 import io.github.openguava.jvtool.lang.constant.StringConstants;
+import io.github.openguava.jvtool.lang.exception.UtilException;
 
 /**
  * sql 工具类
@@ -16,6 +17,49 @@ import io.github.openguava.jvtool.lang.constant.StringConstants;
  */
 public class SqlUtils {
 	
+	/**
+     * 定义常用的 sql关键字
+     */
+    public static String SQL_KEYWORD_REGEX = "and |extractvalue|updatexml|exec |insert |select |delete |update |drop |count |chr |mid |master |truncate |char |declare |or |+|user()";
+	
+    /**
+     * 仅支持字母、数字、下划线、空格、逗号、小数点（支持多个字段排序）
+     */
+    public static String SQL_NORMAL_PATTERN = "[a-zA-Z0-9_\\ \\,\\.]+";
+    
+    /**
+     * 验证 order by 语法是否符合规范
+     */
+    public static boolean isValidOrderBySql(String value) {
+        return value != null && value.matches(SQL_NORMAL_PATTERN);
+    }
+    
+    /**
+     * 检查字符，防止注入绕过
+     */
+    public static String checkOrderBySql(String value) {
+        if (StringUtils.isNotEmpty(value) && !isValidOrderBySql(value)) {
+            throw new UtilException("参数不符合规范，不能进行查询");
+        }
+        return value;
+    }
+    
+    /**
+     * SQL关键字检查
+     */
+    public static void checkKeyword(String value) {
+        if (StringUtils.isEmpty(value)) {
+            return;
+        }
+        String[] sqlKeywords = StringUtils.split(SQL_KEYWORD_REGEX, "\\|");
+        for (String sqlKeyword : sqlKeywords) {
+            if (StringUtils.indexOfIgnoreCase(value, sqlKeyword, 0) > -1)
+            {
+                throw new UtilException("参数存在SQL注入风险");
+            }
+        }
+    }
+    
 	/**
 	 * 是否为常规表名或字段名
 	 * @param name
@@ -378,5 +422,9 @@ public class SqlUtils {
 			str.append(")");
 		}
 		return str.toString();
+	}
+	
+	public static void main(String[] args) {
+		
 	}
 }

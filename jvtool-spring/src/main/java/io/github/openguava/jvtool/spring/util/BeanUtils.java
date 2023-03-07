@@ -30,6 +30,17 @@ public class BeanUtils {
     	return SpringContextHolder.getApplicationContext().getBean(name);
     }
     
+    /**
+     * 获取 bean 对象
+     * @param <T>
+     * @param name
+     * @param requiredType
+     * @return
+     */
+    public static <T> T getBean(String name, Class<T> requiredType) {
+    	return SpringContextHolder.getApplicationContext().getBean(name, requiredType);
+    }
+    
 	/**
 	 * 获取 bean 对象
 	 * @param requiredType bean类型

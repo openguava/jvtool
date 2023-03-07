@@ -127,4 +127,19 @@ public interface AuthLogic {
 	 * @param requiresApi
 	 */
 	void checkApi(RequiresApi requiresApi);
+	
+	/**
+	 * 密码加密
+	 * @param password 要加密的密码
+	 * @return
+	 */
+	String encryptPassword(String password);
+	
+	/**
+	 * 密码校验
+	 * @param rawPassword 明文密码
+	 * @param encryptedPassword 加密后的密码
+	 * @return
+	 */
+	boolean matchesPassword(String rawPassword, String encryptedPassword);
 }
