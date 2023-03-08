@@ -14,9 +14,16 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class JacksonLongSerializer extends JsonSerializer<Long> {
 
 	/** 实例 */
-	public final static JacksonLongSerializer instance = new JacksonLongSerializer();
+	private static volatile JacksonLongSerializer instance;
 	
 	public static JacksonLongSerializer getInstance() {
+		if(instance == null) {
+			synchronized (JacksonLongSerializer.class) {
+				if(instance == null) {
+					instance = new JacksonLongSerializer();
+				}
+			}
+		}
 		return instance;
 	}
 	
