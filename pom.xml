@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.openguava</groupId>
 	<artifactId>jvtool</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<packaging>pom</packaging>
 	<name>jvtool</name>
 	<description>java language tool</description>
@@ -50,8 +50,10 @@
 		<dynamic-ds.version>3.5.2</dynamic-ds.version>
 		<mybatis-plus.version>3.5.3.1</mybatis-plus.version>
 		<pagehelper.boot.version>1.4.6</pagehelper.boot.version>
+		<transmittable-thread-local.version>2.14.2</transmittable-thread-local.version>
 		<swagger.fox.version>3.0.0</swagger.fox.version>
 		<knife4j.version>3.0.3</knife4j.version>
+		<jjwt.version>0.9.1</jjwt.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -215,6 +217,13 @@
 				<artifactId>pagehelper-spring-boot-starter</artifactId>
 				<version>${pagehelper.boot.version}</version>
 			</dependency>
+			
+			<!-- transmittable-thread-local -->
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>transmittable-thread-local</artifactId>
+				<version>${transmittable-thread-local.version}</version>
+			</dependency>
 
 			<!-- jvtool -->
 			<dependency>
@@ -271,7 +280,14 @@
 			    <artifactId>knife4j-micro-spring-boot-starter</artifactId>
 			    <version>${knife4j.version}</version>
 			</dependency>
-
+			
+			<!-- jjwt -->
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt</artifactId>
+				<version>${jjwt.version}</version>
+			</dependency>
+			
 			<!-- junit -->
 			<dependency>
 				<groupId>junit</groupId>

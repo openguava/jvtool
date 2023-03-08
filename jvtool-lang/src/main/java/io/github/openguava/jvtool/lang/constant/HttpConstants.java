@@ -159,6 +159,24 @@ public class HttpConstants {
 	
 	public static final String HTTP_HEADER_UPGRADE = "Upgrade";
 	
+	/** Bearer 认证方式 */
+	public static final String HTTP_AUTHORIZATION_BEARER = "Bearer";
+	
+	/** Bearer 认证方式前缀 */
+	public static final String HTTP_AUTHORIZATION_BEARER_PREFIX = "Bearer ";
+	
+	/** Basic 认证方式 */
+	public static final String HTTP_AUTHORIZATION_BASIC = "Basic";
+	
+	/** Basic 认证方式前缀 */
+	public static final String HTTP_AUTHORIZATION_BASIC_PREFIX = "Basic ";
+	
+	/** Digest 认证方式 */
+	public static final String HTTP_AUTHORIZATION_DIGEST = "Digest";
+	
+	/** Digest 认证方式 前缀 */
+	public static final String HTTP_AUTHORIZATION_DIGEST_PREFIX = "Digest ";
+	
 	public static final String HTTP_MIME_IMAGE_PNG = "image/png";
 	
 	public static final String HTTP_MIME_IMAGE_JPG = "image/jpg";

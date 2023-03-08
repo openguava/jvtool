@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.github.openguava.jvtool.boot.swagger.config.SwaggerAutoConfiguration,\
+io.github.openguava.jvtool.boot.swagger.config.SwaggerWebConfiguration,\
+io.github.openguava.jvtool.boot.swagger.config.SwaggerBeanPostProcessor

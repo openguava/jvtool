@@ -1,6 +1,7 @@
 package io.github.openguava.jvtool.lang.util;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -8,9 +9,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import io.github.openguava.jvtool.lang.constant.ArrayConstants;
 import io.github.openguava.jvtool.lang.constant.StringConstants;
 import io.github.openguava.jvtool.lang.exception.UtilException;
 import io.github.openguava.jvtool.lang.map.ConcurrentWeakKeyHashMap;
@@ -688,6 +692,45 @@ public class ReflectUtils {
 
 		return allFields;
 	}
+	
+    /**
+     * Gets all fields of the given class and its parents (if any) that are annotated with the given annotation.
+     * @param cls
+     *            the {@link Class} to query
+     * @param annotationCls
+     *            the {@link Annotation} that must be present on a field to be matched
+     * @return an array of Fields (possibly empty).
+     * @throws IllegalArgumentException
+     *            if the class or annotation are {@code null}
+     * @since common-lang 3.4
+     */
+    public static Field[] getFieldsWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls) {
+        final List<Field> annotatedFieldsList = getFieldsListWithAnnotation(cls, annotationCls);
+        return annotatedFieldsList.toArray(ArrayConstants.EMPTY_FIELD_ARRAY);
+    }
+
+    /**
+     * Gets all fields of the given class and its parents (if any) that are annotated with the given annotation.
+     * @param cls
+     *            the {@link Class} to query
+     * @param annotationCls
+     *            the {@link Annotation} that must be present on a field to be matched
+     * @return a list of Fields (possibly empty).
+     * @throws IllegalArgumentException
+     *            if the class or annotation are {@code null}
+     * @since common-lang 3.4
+     */
+    public static List<Field> getFieldsListWithAnnotation(final Class<?> cls, final Class<? extends Annotation> annotationCls) {
+        Validate.notNull(annotationCls, "annotationCls");
+        final Field[] allFields = getFieldsDirectly(cls, true);
+        final List<Field> annotatedFields = new ArrayList<>();
+        for (final Field field : allFields) {
+            if (field.getAnnotation(annotationCls) != null) {
+                annotatedFields.add(field);
+            }
+        }
+        return annotatedFields;
+    }
 
 	// ----------------------------------- End Field
 

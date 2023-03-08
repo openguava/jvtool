@@ -383,7 +383,6 @@ public class RegexUtils {
 	 * @param content     被匹配的内容
 	 * @param replacement 替换的内容
 	 * @return 替换后剩余的内容
-	 * @since 5.6.5
 	 */
 	public static String replaceFirst(Pattern pattern, CharSequence content, String replacement) {
 		if (null == pattern || StringUtils.isEmpty(content)) {
@@ -391,6 +390,58 @@ public class RegexUtils {
 		}
 		return pattern.matcher(content).replaceFirst(replacement);
 	}
+	
+    /**
+     * <p>Replaces the first substring of the text string that matches the given regular expression
+     * with the given replacement.</p>
+     *
+     * This method is a {@code null} safe equivalent to:
+     * <ul>
+     *  <li>{@code text.replaceFirst(regex, replacement)}</li>
+     *  <li>{@code Pattern.compile(regex).matcher(text).replaceFirst(replacement)}</li>
+     * </ul>
+     *
+     * <p>A {@code null} reference passed to this method is a no-op.</p>
+     *
+     * <p>The {@link Pattern#DOTALL} option is NOT automatically added.
+     * To use the DOTALL option prepend {@code "(?s)"} to the regex.
+     * DOTALL is also known as single-line mode in Perl.</p>
+     *
+     * <pre>
+     * StringUtils.replaceFirst(null, *, *)       = null
+     * StringUtils.replaceFirst("any", (String) null, *)   = "any"
+     * StringUtils.replaceFirst("any", *, null)   = "any"
+     * StringUtils.replaceFirst("", "", "zzz")    = "zzz"
+     * StringUtils.replaceFirst("", ".*", "zzz")  = "zzz"
+     * StringUtils.replaceFirst("", ".+", "zzz")  = ""
+     * StringUtils.replaceFirst("abc", "", "ZZ")  = "ZZabc"
+     * StringUtils.replaceFirst("&lt;__&gt;\n&lt;__&gt;", "&lt;.*&gt;", "z")      = "z\n&lt;__&gt;"
+     * StringUtils.replaceFirst("&lt;__&gt;\n&lt;__&gt;", "(?s)&lt;.*&gt;", "z")  = "z"
+     * StringUtils.replaceFirst("ABCabc123", "[a-z]", "_")          = "ABC_bc123"
+     * StringUtils.replaceFirst("ABCabc123abc", "[^A-Z0-9]+", "_")  = "ABC_123abc"
+     * StringUtils.replaceFirst("ABCabc123abc", "[^A-Z0-9]+", "")   = "ABC123abc"
+     * StringUtils.replaceFirst("Lorem ipsum  dolor   sit", "( +)([a-z]+)", "_$2")  = "Lorem_ipsum  dolor   sit"
+     * </pre>
+     *
+     * @param text  text to search and replace in, may be null
+     * @param regex  the regular expression to which this string is to be matched
+     * @param replacement  the string to be substituted for the first match
+     * @return  the text with the first replacement processed,
+     *              {@code null} if null String input
+     *
+     * @throws  java.util.regex.PatternSyntaxException
+     *              if the regular expression's syntax is invalid
+     *
+     * @see String#replaceFirst(String, String)
+     * @see java.util.regex.Pattern
+     * @see java.util.regex.Pattern#DOTALL
+     */
+    public static String replaceFirst(final String text, final String regex, final String replacement) {
+        if (text == null || regex == null|| replacement == null ) {
+            return text;
+        }
+        return text.replaceFirst(regex, replacement);
+    }
 
 	/**
 	 * 删除匹配的最后一个内容

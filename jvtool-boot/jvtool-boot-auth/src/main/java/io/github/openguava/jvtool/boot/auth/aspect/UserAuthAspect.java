@@ -1,4 +1,4 @@
-package io.github.openguava.jvtool.spring.aspect.auth;
+package io.github.openguava.jvtool.boot.auth.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

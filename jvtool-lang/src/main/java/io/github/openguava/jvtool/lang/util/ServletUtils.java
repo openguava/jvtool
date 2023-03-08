@@ -917,6 +917,20 @@ public class ServletUtils {
 	}
 	
 	/**
+	 * 从header中获取请求认证令牌
+	 * @param request
+	 * @param prefix 前缀(如Bearer )
+	 * @return
+	 */
+	public static String getRequestAuthorization(HttpServletRequest request, String prefix) {
+		String headerValue = getRequestHeader(request, HttpConstants.HTTP_HEADER_AUTHORIZATION, true);
+		if(headerValue != null && prefix != null && StringUtils.startsWith(headerValue, prefix)) {
+			headerValue = headerValue.replaceFirst(prefix, "");
+		}
+		return headerValue;
+	}
+	
+	/**
 	 * 发送重定向响应
 	 * @param response
 	 * @param targetUrl 要重定向的目标url

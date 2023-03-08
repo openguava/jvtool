@@ -7,12 +7,15 @@ import io.github.openguava.jvtool.ruoyi.exception.base.BaseException;
  * 
  * @author ruoyi
  */
-public class UserException extends BaseException
-{
-    private static final long serialVersionUID = 1L;
+public class UserException extends BaseException {
+	
+	private static final long serialVersionUID = 1L;
 
-    public UserException(String code, Object[] args)
-    {
-        super("user", code, args, null);
-    }
+	public UserException(String code, Object[] args) {
+		super("user", code, args, null);
+	}
+	
+	public UserException(String code, Object[] args, String defaultMessage) {
+		super("user", code, args, defaultMessage);
+	}
 }

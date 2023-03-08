@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.github.openguava.jvtool.boot.auth.aspect.UserAuthAspect,\
+io.github.openguava.jvtool.boot.auth.aspect.ApiAuthAspect

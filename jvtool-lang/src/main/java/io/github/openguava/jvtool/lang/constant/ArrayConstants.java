@@ -1,5 +1,7 @@
 package io.github.openguava.jvtool.lang.constant;
 
+import java.lang.reflect.Field;
+
 /**
  * 数组常量
  * @author openguava
@@ -83,4 +85,11 @@ public class ArrayConstants {
      * An empty immutable {@code Character} array.
      */
     public static final Character[] EMPTY_CHARACTER_OBJECT_ARRAY = new Character[0];
+    
+    /**
+     * An empty immutable {@code Field} array.
+     *
+     * @since 3.10
+     */
+    public static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
 }

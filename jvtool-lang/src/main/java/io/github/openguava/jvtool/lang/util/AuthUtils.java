@@ -2,6 +2,7 @@ package io.github.openguava.jvtool.lang.util;
 
 import java.util.function.Supplier;
 
+import io.github.openguava.jvtool.lang.auth.AuthContext;
 import io.github.openguava.jvtool.lang.auth.AuthLogic;
 import io.github.openguava.jvtool.lang.auth.AuthToken;
 import io.github.openguava.jvtool.lang.auth.AuthUser;
@@ -9,6 +10,7 @@ import io.github.openguava.jvtool.lang.auth.annotation.RequiresAnonymous;
 import io.github.openguava.jvtool.lang.auth.annotation.RequiresApi;
 import io.github.openguava.jvtool.lang.auth.annotation.RequiresPermissions;
 import io.github.openguava.jvtool.lang.auth.annotation.RequiresRoles;
+import io.github.openguava.jvtool.lang.auth.impl.SimpleAuthContext;
 
 /**
  * 认证工具类
@@ -16,6 +18,17 @@ import io.github.openguava.jvtool.lang.auth.annotation.RequiresRoles;
  *
  */
 public class AuthUtils {
+	
+	/** 认证上下文提供者 */
+	private static volatile Supplier<AuthContext> authContextSupplier;
+	
+	public static Supplier<AuthContext> getAuthContextSupplier() {
+		return authContextSupplier;
+	}
+	
+	public static void setAuthContextSupplier(Supplier<AuthContext> authContextSupplier) {
+		AuthUtils.authContextSupplier = authContextSupplier;
+	}
 
 	/** 认证逻辑提供者 */
 	private static volatile Supplier<AuthLogic> authLogicSupplier;
@@ -28,9 +41,31 @@ public class AuthUtils {
 		AuthUtils.authLogicSupplier = authLogicSupplier;
 	}
 	
-	/**
-	 * 用户认证逻辑实例
-	 */
+	/** 认证上下文实例 */
+	private static volatile AuthContext authContext;
+	
+	public static AuthContext getAuthContext() {
+		if(AuthUtils.authContext == null) {
+			synchronized (AuthUtils.class) {
+				if(AuthUtils.authContext == null) {
+					if(AuthUtils.getAuthContextSupplier() != null) {
+						AuthUtils.authContext = AuthUtils.getAuthContextSupplier().get();
+					} else {
+						AuthUtils.authContext = SimpleAuthContext.getInstance();
+					}
+				}
+			}
+		}
+		return AuthUtils.authContext;
+	}
+	
+	public static void setAuthContext(AuthContext authContext) {
+		synchronized (AuthUtils.class) {
+			AuthUtils.authContext = authContext;
+		}
+	}
+	
+	/** 认证逻辑实例 */
 	private static volatile AuthLogic authLogic;
 	
 	public static AuthLogic getAuthLogic() {
@@ -255,5 +290,40 @@ public class AuthUtils {
 	 */
 	public static boolean matchesPassword(String rawPassword, String encryptedPassword) {
 		return getAuthLogic().matchesPassword(rawPassword, encryptedPassword);
+	}
+	
+	/**
+	 * 获取上下文关联值
+	 * @param key 键
+	 * @return
+	 */
+	public static Object getContext(String key) {
+		return getAuthContext().get(key);
+	}
+	
+	/**
+	 * 获取上下文关联值
+	 * @param key 键
+	 * @param clazz 值类型
+	 * @return
+	 */
+	public static <T> T getContext(String key, Class<T> clazz) {
+		return getAuthContext().get(key, clazz);
+	}
+	
+	/**
+	 * 设置上下文关联值
+	 * @param key 键
+	 * @param value 值
+	 */
+	public static void setContext(String key, Object value) {
+		getAuthContext().set(key, value);
+	}
+	
+	/**
+	 * 清除上下文数据
+	 */
+	public static void clearContext() {
+		getAuthContext().clear();
 	}
 }
