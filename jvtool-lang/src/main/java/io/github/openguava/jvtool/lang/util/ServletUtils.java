@@ -256,11 +256,24 @@ public class ServletUtils {
 	 * @param request
 	 * @return
 	 */
-	public static HttpSession getSession(HttpServletRequest request) {
+	public static HttpSession getRequestSession(HttpServletRequest request) {
 		if(request == null && (request = getRequest()) == null) {
 			return null;
 		}
 		return request.getSession();
+	}
+	
+	/**
+	 * 获取当前请求会话
+	 * @param request
+	 * @param create
+	 * @return
+	 */
+	public static HttpSession getRequestSession(HttpServletRequest request, boolean create) {
+		if(request == null && (request = getRequest()) == null) {
+			return null;
+		}
+		return request.getSession(create);
 	}
 	
 	/**

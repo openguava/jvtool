@@ -405,4 +405,42 @@ public class ConvertUtils {
 	public static Date toDate(Object value, Date defaultValue) {
 		return DateUtils.toDate(value, defaultValue);
 	}
+	
+	/**
+	 * 转换为Object
+	 * @param <T>
+	 * @param value
+	 * @param clazz
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T toObject(Object value, Class<T> clazz) {
+		if(value == null) {
+			return null;
+		}
+		if(String.class.isAssignableFrom(clazz)) {//String
+			return (T)ConvertUtils.toString(value);
+		} else if(Long.class.isAssignableFrom(clazz)) {//Long
+			return (T)ConvertUtils.toLong(value);
+		} else if(BigInteger.class.isAssignableFrom(clazz)) {//BigInteger
+			return (T)ConvertUtils.toBigInteger(value);
+		} else if(Integer.class.isAssignableFrom(clazz)) {//Integer
+			return (T)ConvertUtils.toInt(value);
+		} else if(Double.class.isAssignableFrom(clazz)) {//Double
+			return (T)ConvertUtils.toDouble(value);
+		} else if(Float.class.isAssignableFrom(clazz)) {//Float
+			return (T)ConvertUtils.toFloat(value);
+		} else if(BigDecimal.class.isAssignableFrom(clazz)) {//BigDecimal
+			return (T)ConvertUtils.toBigDecimal(value);
+		} else if(Boolean.class.isAssignableFrom(clazz)) {//Boolean
+			return (T)ConvertUtils.toBoolean(value);
+		} else if(Number.class.isAssignableFrom(clazz)) {//Number
+			return (T)ConvertUtils.toNumber(value);
+		} else if(Byte.class.isAssignableFrom(clazz)) {//Byte
+			return (T)ConvertUtils.toByte(value);
+		}  else if(Date.class.isAssignableFrom(clazz)) {//Date
+			return (T)ConvertUtils.toDate(value);
+		} 
+		return (T)value;
+	}
 }

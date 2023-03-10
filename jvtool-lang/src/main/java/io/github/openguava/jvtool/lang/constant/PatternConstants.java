@@ -3,7 +3,8 @@ package io.github.openguava.jvtool.lang.constant;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
-import io.github.openguava.jvtool.lang.map.ConcurrentWeakKeyHashMap;
+import io.github.openguava.jvtool.lang.map.ConcurrentReferenceHashMap;
+import io.github.openguava.jvtool.lang.map.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * 正则模式常量
@@ -12,7 +13,7 @@ import io.github.openguava.jvtool.lang.map.ConcurrentWeakKeyHashMap;
  */
 public class PatternConstants {
 
-	private static final ConcurrentMap<RegexWithFlag, Pattern> CACHE = new ConcurrentWeakKeyHashMap<>();
+	private static final ConcurrentMap<RegexWithFlag, Pattern> CACHE = new ConcurrentReferenceHashMap<>(16, ReferenceType.WEAK);
 	
 	/** 英文字母 、数字和下划线 */
 	public final static Pattern PATTERN_GENERAL = Pattern.compile("^\\w+$");

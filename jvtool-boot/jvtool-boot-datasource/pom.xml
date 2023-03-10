@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>io.github.openguava</groupId>
 		<artifactId>jvtool-boot</artifactId>
-		<version>0.0.5</version>
+		<version>0.0.6</version>
 	</parent>
 	<artifactId>jvtool-boot-datasource</artifactId>
 	<name>jvtool-boot-datasource</name>

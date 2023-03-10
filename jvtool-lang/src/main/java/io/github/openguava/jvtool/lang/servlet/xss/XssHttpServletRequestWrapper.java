@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 import io.github.openguava.jvtool.lang.constant.CharsetConstants;
 import io.github.openguava.jvtool.lang.constant.HttpConstants;
-import io.github.openguava.jvtool.lang.http.HtmlFilter;
+import io.github.openguava.jvtool.lang.html.HtmlFilter;
 import io.github.openguava.jvtool.lang.util.CharsetUtils;
 import io.github.openguava.jvtool.lang.util.IoUtils;
 import io.github.openguava.jvtool.lang.util.StringUtils;

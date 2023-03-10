@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import io.github.openguava.jvtool.lang.cache.AbstractCache;
+import io.github.openguava.jvtool.lang.util.CollectionUtils;
 import io.github.openguava.jvtool.lang.util.ObjectUtils;
 import io.github.openguava.jvtool.lang.util.StringUtils;
 
@@ -60,11 +61,14 @@ public class RedisTemplateCache extends AbstractCache {
 		return new RedisTemplateJsonSerializer<T>(clazz).deserialize(data);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> List<T> getList(String key, Class<T> clazz) {
 		byte[] data = this.getBytes(key);
-		List<T> array = new ArrayList<T>();
-		return new RedisTemplateJsonSerializer<List<T>>(null).deserialize(data);
+		ArrayList<T> list = new ArrayList<T>();
+		Class<? extends ArrayList> listClazz = list.getClass();
+		list = new RedisTemplateJsonSerializer<>(listClazz).deserialize(data);
+		return CollectionUtils.toList(list);
 	}
 
 	@Override

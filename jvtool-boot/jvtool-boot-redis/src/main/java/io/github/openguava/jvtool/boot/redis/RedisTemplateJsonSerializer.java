@@ -22,6 +22,10 @@ public class RedisTemplateJsonSerializer<T> implements RedisSerializer<T> {
 	/** 类型 */
 	private Class<T> clazz;
 	
+	public Class<T> getClazz() {
+		return this.clazz;
+	}
+	
 	/** 字符集 */
 	private Charset charset = CharsetConstants.CHARSET_UTF_8;
 	
@@ -53,5 +57,4 @@ public class RedisTemplateJsonSerializer<T> implements RedisSerializer<T> {
 		String json = new String(bytes, this.charset);
 		return JSON.parseObject(json, this.clazz, JSONReader.Feature.SupportAutoType);
 	}
-
 }

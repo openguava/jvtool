@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 import io.github.openguava.jvtool.lang.cache.AbstractCacheManager;
 import io.github.openguava.jvtool.lang.cache.Cache;
 import io.github.openguava.jvtool.lang.cache.timed.TimedCacheManager;
-import io.github.openguava.jvtool.lang.constant.CharsetConstants;
 import io.github.openguava.jvtool.lang.constant.StringConstants;
 
 /**
@@ -93,8 +92,7 @@ public class CacheUtils {
 	 * @return
 	 */
 	public static String getString(String key) {
-		byte[] bytes = getCache().getBytes(key);
-		return bytes == null ? null : new String(bytes, CharsetConstants.CHARSET_UTF_8);
+		return getItem(key, String.class);
 	}
 	
 	/**

@@ -45,6 +45,14 @@ public class DateUtils {
 			};
 	
 	/**
+	 * 当前时间
+	 * @return
+	 */
+	public static Date now() {
+		return new Date();
+	}
+	
+	/**
 	 * 获取当前时间
 	 * @return
 	 */

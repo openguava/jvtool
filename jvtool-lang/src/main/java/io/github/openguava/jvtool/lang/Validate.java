@@ -19,6 +19,7 @@ package io.github.openguava.jvtool.lang;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import io.github.openguava.jvtool.lang.util.ArrayUtils;
@@ -186,6 +187,23 @@ public class Validate {
             throw new IllegalArgumentException(DEFAULT_IS_TRUE_EX_MESSAGE);
         }
     }
+    
+	/**
+	 * Assert a boolean expression, throwing an {@code IllegalArgumentException}
+	 * if the expression evaluates to {@code false}.
+	 * <pre class="code">
+	 * Assert.isTrue(i &gt; 0, () -&gt; "The value '" + i + "' must be greater than zero");
+	 * </pre>
+	 * @param expression a boolean expression
+	 * @param messageSupplier a supplier for the exception message to use if the
+	 * assertion fails
+	 * @throws IllegalArgumentException if {@code expression} is {@code false}
+	 */
+	public static void isTrue(boolean expression, Supplier<String> messageSupplier) {
+		if (!expression) {
+			throw new IllegalArgumentException(messageSupplier != null ? messageSupplier.get() : null);
+		}
+	}
 
     // notNull
     //---------------------------------------------------------------------------------

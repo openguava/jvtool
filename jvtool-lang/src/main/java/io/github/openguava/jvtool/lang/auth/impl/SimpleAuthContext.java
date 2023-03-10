@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.alibaba.ttl.TransmittableThreadLocal;
 
 import io.github.openguava.jvtool.lang.auth.AuthContext;
+import io.github.openguava.jvtool.lang.util.ConvertUtils;
 
 public class SimpleAuthContext implements AuthContext {
 	
@@ -59,12 +60,17 @@ public class SimpleAuthContext implements AuthContext {
 		if(value == null) {
 			return null;
 		}
-		return (T)value;
+		return ConvertUtils.toObject(value, clazz);
 	}
 
 	@Override
 	public void set(String key, Object value) {
-		this.getMap().put(key, value);
+		Map<String, Object> map = this.getMap();
+		if(value == null && map instanceof ConcurrentHashMap) {
+			map.remove(key);
+		} else {
+			map.put(key, value);
+		}
 	}
 
 	@Override

@@ -17,7 +17,8 @@ import java.util.function.Function;
 import io.github.openguava.jvtool.lang.constant.ArrayConstants;
 import io.github.openguava.jvtool.lang.constant.StringConstants;
 import io.github.openguava.jvtool.lang.exception.UtilException;
-import io.github.openguava.jvtool.lang.map.ConcurrentWeakKeyHashMap;
+import io.github.openguava.jvtool.lang.map.ConcurrentReferenceHashMap;
+import io.github.openguava.jvtool.lang.map.ConcurrentReferenceHashMap.ReferenceType;
 import io.github.openguava.jvtool.lang.Validate;
 
 /**
@@ -40,17 +41,17 @@ public class ReflectUtils {
 	/**
 	 * 构造对象缓存
 	 */
-	private static final ConcurrentMap<Class<?>, Constructor<?>[]> CONSTRUCTORS_CACHE = new ConcurrentWeakKeyHashMap<>();
+	private static final ConcurrentMap<Class<?>, Constructor<?>[]> CONSTRUCTORS_CACHE = new ConcurrentReferenceHashMap<>(16, ReferenceType.WEAK);
 
 	/**
 	 * 字段缓存
 	 */
-	private static final ConcurrentMap<Class<?>, Field[]> FIELDS_CACHE = new ConcurrentWeakKeyHashMap<>();
+	private static final ConcurrentMap<Class<?>, Field[]> FIELDS_CACHE = new ConcurrentReferenceHashMap<>(16, ReferenceType.WEAK);
 
 	/**
 	 * 方法缓存
 	 */
-	private static final ConcurrentMap<Class<?>, Method[]> METHODS_CACHE = new ConcurrentWeakKeyHashMap<>();
+	private static final ConcurrentMap<Class<?>, Method[]> METHODS_CACHE = new ConcurrentReferenceHashMap<>(16, ReferenceType.WEAK);
 
 	/**
 	 * 获得对象数组的类数组

@@ -1,4 +1,4 @@
-package io.github.openguava.jvtool.lang.http;
+package io.github.openguava.jvtool.lang.html;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -243,6 +243,41 @@ public final class HtmlFilter {
 
 		s = validateEntities(s);
 		debug("    validateEntites: " + s);
+
+		debug("************************************************\n\n");
+		return s;
+	}
+	
+	/**
+	 * given a user submitted input String, filter out any invalid or restricted html.
+	 *
+	 * @param input text (i.e. submitted by a user) than may contain html
+	 * @param validateEntity 
+	 * @return "clean" version of input, with only valid, whitelisted html elements allowed
+	 */
+	public String filter(final String input, boolean validateEntity) {
+		reset();
+		String s = input;
+
+		debug("************************************************");
+		debug("              INPUT: " + input);
+
+		s = escapeComments(s);
+		debug("     escapeComments: " + s);
+
+		s = balanceHTML(s);
+		debug("        balanceHTML: " + s);
+
+		s = checkTags(s);
+		debug("          checkTags: " + s);
+
+		s = processRemoveBlanks(s);
+		debug("processRemoveBlanks: " + s);
+
+		if(validateEntity) {
+			s = validateEntities(s);
+			debug("    validateEntites: " + s);
+		}
 
 		debug("************************************************\n\n");
 		return s;
